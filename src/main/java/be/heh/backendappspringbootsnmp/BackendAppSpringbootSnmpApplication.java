@@ -5,9 +5,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BackendAppSpringbootSnmpApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(BackendAppSpringbootSnmpApplication.class, args);
-    }
-
+    public static void main(String[] args) {SpringApplication.run(BackendAppSpringbootSnmpApplication.class, args);}
 }
