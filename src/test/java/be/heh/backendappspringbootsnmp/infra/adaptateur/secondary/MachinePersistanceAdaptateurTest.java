@@ -1,6 +1,7 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
