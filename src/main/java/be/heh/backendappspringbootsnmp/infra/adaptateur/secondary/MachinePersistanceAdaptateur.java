@@ -13,8 +13,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MachinePersistanceAdaptateur implements MachinePortOut {
 
-    private MachineRepository machineRepository;
-    private MachineMapper machineMapper;
+    private final MachineRepository machineRepository;
+    private final MachineMapper machineMapper;
     @Getter
     @Setter
     private List<MachineEntity> machineEntities = new ArrayList<>();

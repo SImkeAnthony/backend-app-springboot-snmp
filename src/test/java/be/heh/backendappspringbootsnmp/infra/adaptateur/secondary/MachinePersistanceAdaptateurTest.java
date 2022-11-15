@@ -33,7 +33,7 @@ public class MachinePersistanceAdaptateurTest extends AbstractIntegrationTest {
     @Sql({"createMachineTable.sql","insertMachine.sql"})
     public void testGetAllMachineEntities(){
         machineMapper = new MachineMapper();
-        machinePersistanceAdaptateur = new MachinePersistanceAdaptateur();
+        machinePersistanceAdaptateur = new MachinePersistanceAdaptateur(machineRepository,machineMapper);
         List<MachineEntity> machineEntities = new ArrayList<>();
         machineEntities = machinePersistanceAdaptateur.getAllMachineEntities();
         assertEquals("192.168.0.1",machineEntities.get(0).ipAdd());
