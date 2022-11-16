@@ -13,7 +13,7 @@ public class MachineMapper {
     public List<MachineEntity> mapMachineJpaToDomain(List<MachineJpaEntity> machineJpaEntities){
         List<MachineEntity> machineEntities = new ArrayList<>();
         for (MachineJpaEntity machineJpaEntity : machineJpaEntities){
-            machineEntities.add(new MachineEntity(machineJpaEntity.getIpAdd(),machineJpaEntity.isSnmp()));
+            machineEntities.add(new MachineEntity(machineJpaEntity.getMacAdd(),machineJpaEntity.getIpAdd(),machineJpaEntity.getHostName(),machineJpaEntity.getType(),machineJpaEntity.isSnmp()));
         }
         return machineEntities;
     }
@@ -23,7 +23,7 @@ public class MachineMapper {
     public List<MachineJpaEntity> mapMachineDomainToJpa(List<MachineEntity> machineEntities){
         List<MachineJpaEntity> machineJpaEntities = new ArrayList<>();
         for (MachineEntity machineEntity:machineEntities){
-            machineJpaEntities.add(new MachineJpaEntity(machineEntity.ipAdd(),machineEntity.snmp()));
+            machineJpaEntities.add(new MachineJpaEntity(machineEntity.macAdd(),machineEntity.ipAdd(),machineEntity.hostName(),machineEntity.type(),machineEntity.snmp()));
         }
         return machineJpaEntities;
     }

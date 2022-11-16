@@ -15,13 +15,20 @@ public class MachineJpaEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "mac_add")
+    private String macAdd;
     @Column(name = "ip_add")
     private String ipAdd;
 
+    @Column(name = "host_name")
+    private String hostName;
+
+    @Column(name = "type_")
+    private String type;
     @Column(name = "snmp")
     private boolean snmp;
 
     //constructor
     public MachineJpaEntity(){}
-    public MachineJpaEntity(String ipAdd,boolean snmp){this.ipAdd=ipAdd;this.snmp=snmp;}
+    public MachineJpaEntity(String macAdd,String ipAdd,String hostName,String type,boolean snmp){this.macAdd=macAdd;this.ipAdd=ipAdd;this.hostName=hostName;this.type=type;this.snmp=snmp;}
 }

@@ -35,9 +35,9 @@ public class MachineRestControllerTest {
     public void testGetAllMachineEntities() throws Exception {
 
         //Records
-        machineEntities.add(new MachineEntity("192.168.0.1",true));
-        machineEntities.add(new MachineEntity("192.168.0.10",false));
-        machineEntities.add(new MachineEntity("192.168.0.15",true));
+        machineEntities.add(new MachineEntity("02-23-04-05-06-07","192.168.0.15","pc-1","pc",true));
+        machineEntities.add(new MachineEntity("02-23-04-05-06-08","192.168.0.1","routeur-1","routeur",false));
+        machineEntities.add(new MachineEntity("02-23-04-05-06-09","192.168.0.250","serveur-1","serveur",true));
 
         //Stub
         Mockito.when(machinePortIn.getAllMachineEntities()).thenReturn(machineEntities);
@@ -47,7 +47,9 @@ public class MachineRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
-                .andExpect(jsonPath("$[2].ipAdd",is("192.168.0.15")));
+                .andExpect(jsonPath("$[2].ipAdd",is("192.168.0.250")))
+                .andExpect(jsonPath("$[1].hostName",is("routeur-1")))
+                .andExpect(jsonPath("$[0].hostName",is("pc-1")));
     }
 
 }
