@@ -15,9 +15,9 @@ public class MachineJpaEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "mac_add")
+    @Column(name = "mac_addr")
     private String macAdd;
-    @Column(name = "ip_add")
+    @Column(name = "ip_addr")
     private String ipAdd;
 
     @Column(name = "host_name")

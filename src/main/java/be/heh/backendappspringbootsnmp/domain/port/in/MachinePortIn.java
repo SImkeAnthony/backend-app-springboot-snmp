@@ -5,5 +5,5 @@ import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import java.util.List;
 
 public interface MachinePortIn {
-    public List<MachineEntity> getAllMachineEntities();
+    public Iterable<MachineEntity> getAllMachineEntities();
 }

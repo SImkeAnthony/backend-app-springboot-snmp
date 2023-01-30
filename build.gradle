@@ -37,7 +37,11 @@ dependencies {
 
     implementation 'org.flywaydb:flyway-core:9.4.0'
 
+    //SNMP
     implementation 'org.snmp4j:snmp4j:3.7.4'
+
+    //SCANNER->NMAP->include a internal library
+    implementation fileTree(dir: 'libs',includes: ['*.jar'])
 }
 
 tasks.named('test') {
