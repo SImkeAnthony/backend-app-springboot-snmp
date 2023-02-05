@@ -23,7 +23,7 @@ public class MachineMapper {
     public List<MachineJpaEntity> mapMachineDomainToJpa(List<MachineEntity> machineEntities){
         List<MachineJpaEntity> machineJpaEntities = new ArrayList<>();
         for (MachineEntity machineEntity:machineEntities){
-            machineJpaEntities.add(new MachineJpaEntity(machineEntity.macAdd(),machineEntity.ipAdd(),machineEntity.hostName(),machineEntity.type(),machineEntity.snmp()));
+            machineJpaEntities.add(new MachineJpaEntity(machineEntity.getMacAddr(),machineEntity.getIpAddr(),machineEntity.getHostname(),machineEntity.getDevice(),machineEntity.getSnmp()));
         }
         return machineJpaEntities;
     }

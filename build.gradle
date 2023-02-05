@@ -16,6 +16,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -37,11 +38,14 @@ dependencies {
 
     implementation 'org.flywaydb:flyway-core:9.4.0'
 
+    //Log
+    implementation "org.slf4j:slf4j-api:1.7.36"
+
     //SNMP
     implementation 'org.snmp4j:snmp4j:3.7.4'
 
-    //SCANNER->NMAP->include a internal library
-    implementation fileTree(dir: 'libs',includes: ['*.jar'])
+    //Nmap
+    implementation fileTree(dir:'libs',includes: ['*.jar'])
 }
 
 tasks.named('test') {
