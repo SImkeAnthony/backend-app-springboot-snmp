@@ -23,12 +23,12 @@ public class MachineJpaEntity {
     @Column(name = "host_name")
     private String hostName;
 
-    @Column(name = "type_")
-    private String type;
+    @Column(name = "os")
+    private String os;
     @Column(name = "snmp")
     private boolean snmp;
 
     //constructor
     public MachineJpaEntity(){}
-    public MachineJpaEntity(String macAdd,String ipAdd,String hostName,String type,boolean snmp){this.macAdd=macAdd;this.ipAdd=ipAdd;this.hostName=hostName;this.type=type;this.snmp=snmp;}
+    public MachineJpaEntity(String macAdd,String ipAdd,String hostName,String os,boolean snmp){this.macAdd=macAdd;this.ipAdd=ipAdd;this.hostName=hostName;this.os=os;this.snmp=snmp;}
 }

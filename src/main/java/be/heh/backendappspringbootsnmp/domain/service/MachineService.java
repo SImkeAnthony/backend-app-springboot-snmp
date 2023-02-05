@@ -26,7 +26,7 @@ public class MachineService implements MachinePortIn {
 
     @Override
     public Iterable<MachineEntity> getAllMachineEntities() throws NMapExecutionException, NMapInitializationException {
-        discoverMAchineEntities=getDeviceScannerPortOut().getAllMachineOnNetwork("10.10.10.1-254");
+        getDeviceScannerPortOut().getAllIpOnNetwork("10.10.10.1-254");
         return discoverMAchineEntities;
     }
 

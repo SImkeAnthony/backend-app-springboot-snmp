@@ -3,16 +3,18 @@ package be.heh.backendappspringbootsnmp.domain.entities;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class MachineEntity {
     @Getter
-    private final String macAddr;
+    private final List<String> macAddr;
     @Getter
-    private final String ipAddr;
+    private final List<String> ipAddr;
     @Getter
     private final String hostname;
     @Getter
-    private final String device;
+    private final String os;
     @Getter
     private final Boolean snmp;
 

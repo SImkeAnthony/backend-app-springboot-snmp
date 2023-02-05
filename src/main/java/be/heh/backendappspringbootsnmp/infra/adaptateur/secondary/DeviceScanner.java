@@ -7,12 +7,15 @@ import org.nmap4j.Nmap4j;
 import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
+import org.nmap4j.data.host.Address;
 import org.nmap4j.data.nmaprun.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 @RequiredArgsConstructor
 public class DeviceScanner implements DeviceScannerPortOut {
     private final String pathNmapExecutale="C:\\Program Files (x86)\\Nmap";
@@ -22,23 +25,29 @@ public class DeviceScanner implements DeviceScannerPortOut {
     private Logger logger = LoggerFactory.getLogger(DeviceScanner.class);
 
     @Override
-    public List<MachineEntity> getAllMachineOnNetwork(String ipRange) {
-        List<MachineEntity>machineEntities=new ArrayList<>();
+    public List<String> getAllIpOnNetwork(String ipRange) {
+        List<String>ipAddress=new ArrayList<>();
         nmap4j.includeHosts(ipRange);
-        nmap4j.addFlags("-");
+        nmap4j.addFlags("-sP");
         try{
             nmap4j.execute();
             if(!nmap4j.hasError()){
                 NMapRun run = nmap4j.getResult();
                 ArrayList<Host> hosts = run.getHosts();
-                hosts.forEach(host->System.out.println(host)
-                        );
+                for(Host host : hosts){
+                    List<Address> hostAddresses = host.getAddresses();
+                    for(Address addrr : hostAddresses){
+                        if(Objects.equals(addrr.getAddrtype(), "ipv4")){
+                            ipAddress.add(addrr.getAddr());
+                        }
+                    }
+                }
             }else {
                 logger.error(nmap4j.getExecutionResults().getErrors());
             }
         }catch (NMapExecutionException | NMapInitializationException e){
             throw  new RuntimeException(e);
         }
-        return machineEntities;
+        return ipAddress ;
     }
 }
