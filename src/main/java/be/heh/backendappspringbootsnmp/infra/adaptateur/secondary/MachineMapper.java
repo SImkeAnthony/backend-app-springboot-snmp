@@ -15,8 +15,8 @@ public class MachineMapper {
     public List<MachineEntity> mapMachineJpaToDomain(List<MachineJpaEntity> machineJpaEntities){
         List<MachineEntity> machineEntities = new ArrayList<>();
         for (MachineJpaEntity machineJpaEntity : machineJpaEntities){
-            List<String> macAddr = Arrays.asList(machineJpaEntity.getMacAdd().split("-"));
-            List<String> ipAddr = Arrays.asList(machineJpaEntity.getIpAdd().split("-"));
+            List<String> macAddr = Arrays.asList(machineJpaEntity.getMacAdd().split("/"));
+            List<String> ipAddr = Arrays.asList(machineJpaEntity.getIpAdd().split("/"));
             machineEntities.add(new MachineEntity(macAddr,ipAddr,machineJpaEntity.getHostName(),machineJpaEntity.getOs(),machineJpaEntity.isSnmp()));
         }
         return machineEntities;
@@ -33,14 +33,14 @@ public class MachineMapper {
             for (String mac:machineEntity.getMacAddr()) {
                 macAddr+=mac;
                 if(machineEntity.getMacAddr().indexOf(mac) != machineEntity.getMacAddr().size()-1){
-                    macAddr+='-';
+                    macAddr+='/';
                 }
             }
             //Convert list to string for ipAddress
             for (String ip:machineEntity.getIpAddr()){
                 ipAddr+=ip;
                 if(machineEntity.getIpAddr().indexOf(ip) != machineEntity.getIpAddr().size()-1){
-                    ipAddr+='-';
+                    ipAddr+='/';
                 }
             }
             machineJpaEntities.add(new MachineJpaEntity(macAddr,ipAddr,machineEntity.getHostname(),machineEntity.getOs(),machineEntity.getSnmp()));

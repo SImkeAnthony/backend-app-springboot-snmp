@@ -8,13 +8,14 @@ import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
 import org.nmap4j.data.host.Address;
+import org.nmap4j.data.host.os.PortUsed;
+import org.nmap4j.data.host.ports.Port;
 import org.nmap4j.data.nmaprun.Host;
+import org.nmap4j.data.nmaprun.host.ports.port.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class DeviceScanner implements DeviceScannerPortOut {
@@ -49,5 +50,85 @@ public class DeviceScanner implements DeviceScannerPortOut {
             throw  new RuntimeException(e);
         }
         return ipAddress ;
+    }
+
+    @Override
+    public List<MachineEntity> getAllInfoOfMachines(List<String> ipAddress) throws NMapExecutionException, NMapInitializationException {
+        List<MachineEntity> machineEntities = null;
+        Nmap4j newInfoScan = new Nmap4j(pathNmapExecutale);
+        String hosts="";
+        for (String ip : ipAddress){
+            if(ipAddress.indexOf(ip)==ipAddress.size()-1){
+                hosts+=ip;
+            }else{
+                hosts+=ip+"-";
+            }
+
+        }
+        System.out.println("host scanned : "+hosts);
+        newInfoScan.includeHosts(hosts);
+        newInfoScan.addFlags("-O -sS");
+        try{
+            newInfoScan.execute();
+            if(!newInfoScan.hasError()){
+                NMapRun run = newInfoScan.getResult();
+                List<Host> scannedHosts = run.getHosts();
+                for (Host host : scannedHosts){
+                    //display host info
+                    System.out.println(host.toString());
+
+                    //Default variables
+                    List<String> ipAddr = new ArrayList<>();
+                    List<String> macAddr =  new ArrayList<>();
+                    String hostname="unknown";
+                    String os = "unknown";
+                    Boolean snmp = false;
+
+                    //check if data exist for each host
+
+                    //Address
+                    List<Address> addressHost = host.getAddresses();
+                    if(!addressHost.isEmpty()){
+                        for (Address addr : addressHost){
+                            if(addr.getAddrtype()=="ipv4"){
+                                ipAddr.add(addr.toString());
+                            }
+                            if(addr.getAddrtype()=="mac"){
+                                macAddr.add(addr.toString());
+                            }
+                        }
+                    }
+                    //hostname
+                    if(host.getHostnames()!=null){
+                        hostname=host.getHostnames().toString();
+                    }
+                    //os
+                    if(host.getOs()!=null){
+                        os=host.getOs().toString();
+                    }
+                    //snmp
+                    List<PortUsed>usedPorts = host.getOs().getPortUseds();
+                    ArrayList<Port> ports = host.getPorts().getPorts();
+                    Port snmpPort1 = new Port();
+                    Port snmpPort2 = new Port();
+                    snmpPort1.setPortId(161);
+                    snmpPort1.setProtocol("snmp");
+                    snmpPort2.setPortId(162);
+                    snmpPort2.setProtocol("snmp");
+                    if(usedPorts.contains(snmpPort1) || ports.contains(snmpPort1) || usedPorts.contains(snmpPort2) || ports.contains(snmpPort2)){
+                        snmp = true;
+                    }
+
+                    MachineEntity machineEntity = new MachineEntity(macAddr,ipAddr,hostname,os,snmp);
+                    machineEntities.add(machineEntity);
+
+                }//end of for
+            }else {
+                logger.error(newInfoScan.getExecutionResults().getErrors());
+            }
+        }catch (NMapExecutionException | NMapInitializationException e){
+            throw  new RuntimeException(e);
+        }
+        return machineEntities ;
     }
 }
