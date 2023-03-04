@@ -23,10 +23,10 @@ public class MachineService implements MachinePortIn {
     private final DeviceScannerPortOut deviceScannerPortOut;
     @Getter
     @Setter
-    private List<MachineEntity>registerMAchineEntities=new ArrayList<>();
+    private List<MachineEntity>registerMachineEntities=new ArrayList<>();
     @Getter
     @Setter
-    private List<MachineEntity>discoverMAchineEntities=new ArrayList<>();
+    private List<MachineEntity>discoverMachineEntities=new ArrayList<>();
 
 
     @Override
@@ -38,7 +38,7 @@ public class MachineService implements MachinePortIn {
 
         //setDiscoverMAchineEntities(getDeviceScannerPortOut().getAllInfoOfMachines(ipAddress));
         // display -> getDiscoverMAchineEntities().forEach(System.out::println);
-        return discoverMAchineEntities;
+        return discoverMachineEntities;
     }
 
 }
