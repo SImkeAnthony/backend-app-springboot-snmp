@@ -1,12 +1,9 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
-import be.heh.backendappspringbootsnmp.domain.port.out.snmpGetInfoPortOut;
+import be.heh.backendappspringbootsnmp.domain.port.out.SnmpGetInfoPortOut;
 import lombok.Getter;
-import org.snmp4j.CommunityTarget;
-import org.snmp4j.PDU;
-import org.snmp4j.Snmp;
-import org.snmp4j.TransportMapping;
+import org.snmp4j.*;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.*;
@@ -16,20 +13,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class snmpGet implements snmpGetInfoPortOut {
+public class SnmpGet implements SnmpGetInfoPortOut {
 
     @Getter
-    private static int snmpVersion = SnmpConstants.version3;
+    private static int snmpVersion = SnmpConstants.version1;
     @Getter
     private static int port = 161;
     @Getter
-    private static int secondPort = 161;
+    private static int secondPort = 162;
     @Getter
     private static List<String> oidList = new ArrayList<String>();
     @Getter
     private static String community = "public";
     @Override
     public MachineEntity getSomeInfo(String ipAddress) throws IOException {
+
+        //add oid
+        getOidList().add(".1.3.6.1.2.1.1.1.0");
 
         System.out.println("Start snmp Get");
 
