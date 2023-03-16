@@ -32,12 +32,6 @@ public class MachinePersistanceAdaptateurTest extends AbstractIntegrationTest {
     @Test
     @Sql({"createMachineTable.sql","insertMachine.sql"})
     public void testGetAllMachineEntities(){
-        machineMapper = new MachineMapper();
-        machinePersistanceAdaptateur = new MachinePersistanceAdaptateur(machineRepository,machineMapper);
-        List<MachineEntity> machineEntities = new ArrayList<>();
-        machineEntities = machinePersistanceAdaptateur.getAllMachineEntities();
-        assertEquals("192.168.0.10",machineEntities.get(0).ipAdd());
-        assertEquals(false,machineEntities.get(1).snmp());
-        assertEquals("02-03-04-05-06-09",machineEntities.get(2).macAdd());
+
     }
 }

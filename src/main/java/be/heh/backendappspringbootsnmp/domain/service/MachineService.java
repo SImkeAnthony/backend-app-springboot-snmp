@@ -35,16 +35,15 @@ public class MachineService implements MachinePortIn {
 
 
     @Override
-    public Iterable<MachineEntity> getAllMachineEntities() throws NMapExecutionException, NMapInitializationException, IOException {
-        List<String> ipAddress= getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
-        ipAddress.forEach(System.out::println);
-
-        //Not working well -> implement os,hostname and snmp with snmp4j
-
-        //setDiscoverMAchineEntities(getDeviceScannerPortOut().getAllInfoOfMachines(ipAddress));
-        // display -> getDiscoverMAchineEntities().forEach(System.out::println);
-
-        getSnmpGetInfoPortOut().getSomeInfo("192.168.0.12");
+    public Iterable<MachineEntity> getAllMachineEntities()  {
+        try{
+            List<String> ipAddress= getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
+            ipAddress.forEach(System.out::println);
+            getSnmpGetInfoPortOut().getSomeInfo("192.168.0.12");
+        } catch (IOException | NMapInitializationException | NMapExecutionException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
         return discoverMachineEntities;
     }
