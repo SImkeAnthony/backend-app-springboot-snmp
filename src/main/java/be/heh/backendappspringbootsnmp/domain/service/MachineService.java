@@ -39,7 +39,7 @@ public class MachineService implements MachinePortIn {
         try{
             List<String> ipAddress= getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
             ipAddress.forEach(System.out::println);
-            getSnmpGetInfoPortOut().getSomeInfo("192.168.0.12");
+            getSnmpGetInfoPortOut().getSomeInfo("127.0.0.1");
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

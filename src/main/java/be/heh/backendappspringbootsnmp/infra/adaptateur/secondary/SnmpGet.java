@@ -20,7 +20,6 @@ import java.util.function.BiConsumer;
 
 public class SnmpGet implements SnmpGetInfoPortOut {
 
-
     @Getter
     Snmp snmp;
     @Getter
@@ -74,7 +73,7 @@ public class SnmpGet implements SnmpGetInfoPortOut {
         getOidList().add("1.3.6.1.2.1.1.1.0");
 
         //create a target
-        Address address = GenericAddress.parse(String.format("udp:%s/%s", ipAddress, getPort()));
+        Address address = GenericAddress.parse(String.format("udp:%s/%s", ipAddress, getSecondPort()));
         Target<Address> userTarget = new UserTarget<>();
         userTarget.setAddress(address);
         System.out.println("User Address : "+userTarget.getAddress());
@@ -127,34 +126,6 @@ public class SnmpGet implements SnmpGetInfoPortOut {
             }
         }
 
-        //manage process agent
-        /*
-        if(responseEvent!=null){
-            System.out.println("Get response from agent");
-            PDU responseAgent = responseEvent.getResponse();
-
-            if(responseAgent!=null){
-                int errorStatus = responseAgent.getErrorStatus();
-                int errorIndex = responseAgent.getErrorIndex();
-                String errorStatusText = responseAgent.getErrorStatusText();
-
-                if(errorStatus==PDU.noError){
-                    System.out.println("Response GET : "+responseAgent.getVariableBindings());
-                }else{
-                    System.out.println("Error : request failed!");
-                    System.out.println("Error status : "+errorStatus);
-                    System.out.println("Error index : "+errorIndex);
-                    System.out.println("Error status text : "+errorStatusText);
-                }
-            }else{
-                System.out.println("Error response from agent is null!");
-            }
-        }else{
-            System.out.println("Error agent timeout ...");
-        }
-        snmp.close();
-        return null;
-        */
         return null;
     }
 
