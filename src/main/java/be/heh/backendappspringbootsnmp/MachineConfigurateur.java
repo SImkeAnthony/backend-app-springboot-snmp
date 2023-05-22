@@ -3,12 +3,9 @@ package be.heh.backendappspringbootsnmp;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
-import be.heh.backendappspringbootsnmp.domain.port.out.SnmpGetInfoPortOut;
+import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import be.heh.backendappspringbootsnmp.domain.service.MachineService;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.DeviceScanner;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.MachineMapper;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.MachinePersistanceAdaptateur;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.SnmpGet;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,15 +21,15 @@ public class MachineConfigurateur {
     private MachineMapper machineMapper=new MachineMapper();
     private MachinePersistanceAdaptateur machinePersistanceAdaptateur;
     private DeviceScanner deviseScanner;
-    private SnmpGet snmpGet;
+    private SnmpManager snmpManager;
 
     @Primary
     @Bean
     public MachinePortIn getMachinePortIn(){
         machinePersistanceAdaptateur = new MachinePersistanceAdaptateur(machineRepository,machineMapper);
         deviseScanner = new DeviceScanner();
-        snmpGet = new SnmpGet();
-        return new MachineService(machinePersistanceAdaptateur,deviseScanner,snmpGet);
+        snmpManager = new SnmpManager();
+        return new MachineService(machinePersistanceAdaptateur,deviseScanner,snmpManager);
     }
 
     @Bean
@@ -41,7 +38,7 @@ public class MachineConfigurateur {
     }
 
     @Bean
-    public SnmpGetInfoPortOut getSnmpGetInfoPortOut(){return  new SnmpGet();}
+    public SnmpManagerPortOut getSnmpManagerPortOut(){return new SnmpManager();}
 
     @Bean
     public MachinePortOut getMachinePortOut(){

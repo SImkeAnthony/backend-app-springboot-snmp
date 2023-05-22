@@ -3,9 +3,9 @@ package be.heh.backendappspringbootsnmp.domain.port.out;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 
 import java.io.IOException;
-import java.net.SocketException;
+import java.util.List;
 
-public interface SnmpGetInfoPortOut {
+public interface SnmpManagerPortOut {
 
-    public MachineEntity getSomeInfo(String ipAddress) throws IOException;
+    public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress) throws IOException;
 }

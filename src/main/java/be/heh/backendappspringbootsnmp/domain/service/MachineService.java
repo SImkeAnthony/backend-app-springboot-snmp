@@ -4,7 +4,7 @@ import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
-import be.heh.backendappspringbootsnmp.domain.port.out.SnmpGetInfoPortOut;
+import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,7 +25,7 @@ public class MachineService implements MachinePortIn {
     private final DeviceScannerPortOut deviceScannerPortOut;
 
     @Getter
-    private final SnmpGetInfoPortOut snmpGetInfoPortOut;
+    private final SnmpManagerPortOut snmpManagerPortOut;
     @Getter
     @Setter
     private List<MachineEntity>registerMachineEntities=new ArrayList<>();
@@ -39,7 +39,9 @@ public class MachineService implements MachinePortIn {
         try{
             List<String> ipAddress= getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
             ipAddress.forEach(System.out::println);
-            getSnmpGetInfoPortOut().getSomeInfo("127.0.0.1");
+            List<String> dummyIpAddress = new ArrayList<>();
+            dummyIpAddress.add("127.0.0.1");
+            getSnmpManagerPortOut().getInfoMachineEntities(dummyIpAddress);
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
