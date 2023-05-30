@@ -22,23 +22,29 @@ public class MachineConfigurateur {
     private MachinePersistanceAdaptateur machinePersistanceAdaptateur;
     private DeviceScanner deviseScanner;
     private SnmpManager snmpManager;
+    private OIDPersistanceAdaptateur oidPersistanceAdaptateur;
+    private OIDMapper oidMapper;
 
     @Primary
     @Bean
     public MachinePortIn getMachinePortIn(){
         machinePersistanceAdaptateur = new MachinePersistanceAdaptateur(machineRepository,machineMapper);
         deviseScanner = new DeviceScanner();
-        snmpManager = new SnmpManager();
+        oidMapper = new OIDMapper();
+        oidPersistanceAdaptateur = new OIDPersistanceAdaptateur(oidMapper);
+        snmpManager = new SnmpManager(oidPersistanceAdaptateur);
         return new MachineService(machinePersistanceAdaptateur,deviseScanner,snmpManager);
     }
 
     @Bean
-    public DeviceScannerPortOut getDeviceScannerPortOut(){
-        return new DeviceScanner();
-    }
+    public DeviceScannerPortOut getDeviceScannerPortOut(){return new DeviceScanner();}
 
     @Bean
-    public SnmpManagerPortOut getSnmpManagerPortOut(){return new SnmpManager();}
+    public SnmpManagerPortOut getSnmpManagerPortOut(){
+        oidMapper = new OIDMapper();
+        oidPersistanceAdaptateur = new OIDPersistanceAdaptateur(oidMapper);
+        return new SnmpManager(oidPersistanceAdaptateur);
+    }
 
     @Bean
     public MachinePortOut getMachinePortOut(){

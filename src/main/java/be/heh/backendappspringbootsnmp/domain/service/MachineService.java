@@ -41,12 +41,14 @@ public class MachineService implements MachinePortIn {
             ipAddress.forEach(System.out::println);
             List<String> dummyIpAddress = new ArrayList<>();
             dummyIpAddress.add("127.0.0.1");
-            getSnmpManagerPortOut().getInfoMachineEntities(dummyIpAddress);
+            discoverMachineEntities = getSnmpManagerPortOut().getInfoMachineEntities(dummyIpAddress);
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
+        for(MachineEntity machineEntity : discoverMachineEntities){
+            System.out.println("hostname : "+machineEntity.getHostname()+" / os : "+machineEntity.getOs());
+        }
         return discoverMachineEntities;
     }
 

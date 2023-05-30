@@ -4,6 +4,7 @@ import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.responder.SnmpListener;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.snmp4j.*;
 import org.snmp4j.event.ResponseListener;
@@ -18,7 +19,7 @@ import org.snmp4j.util.DefaultPDUFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+@RequiredArgsConstructor
 public class SnmpManager implements SnmpManagerPortOut {
 
     @Setter
@@ -51,6 +52,9 @@ public class SnmpManager implements SnmpManagerPortOut {
     private List<String> OIDs = new ArrayList<>();
     @Getter
     private int port = 162;
+    @Getter
+    @Setter
+    private final OIDPersistanceAdaptateur oidPersistanceAdaptateur;
 
     private void initSnmpV1() throws IOException {
         setSnmp(new Snmp());
@@ -103,7 +107,11 @@ public class SnmpManager implements SnmpManagerPortOut {
     }
     private void initOIDs(){
         getOIDs().clear();
-        getOIDs().add("1.3.2.3.6.2.1.1.2");
+        getOIDs().add("1.3.2.3.6.2.1.1.1");
+        getOIDs().add("1.3.2.3.6.2.1.2.1");
+        getOIDs().add("1.3.2.3.6.2.1.3.1");
+        getOIDs().add("1.3.2.3.6.2.1.4.1");
+        getOIDs().add("1.3.2.3.6.2.1.5.1");
     }
     private void initPDU(int pduType){
         initOIDs();
@@ -167,7 +175,7 @@ public class SnmpManager implements SnmpManagerPortOut {
         //initializeListeningEvent();
         for(String ip:ipAddress){
             System.out.println("send PDU : "+getPdu());
-            getSnmp().send(getPdu(),getCommunityTarget(ip),null,new SnmpListener());
+            getSnmp().send(getPdu(),getCommunityTarget(ip),null,new SnmpListener(machineEntities,getOidPersistanceAdaptateur()));
         }
         return machineEntities;
     }
