@@ -32,24 +32,27 @@ public class MachineService implements MachinePortIn {
     @Getter
     @Setter
     private List<MachineEntity>discoverMachineEntities=new ArrayList<>();
-
+    @Getter
+    @Setter
+    private List<String> ipAddress =new ArrayList<>();
 
     @Override
     public Iterable<MachineEntity> getAllMachineEntities()  {
         try{
-            List<String> ipAddress= getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
-            ipAddress.forEach(System.out::println);
-            List<String> dummyIpAddress = new ArrayList<>();
-            dummyIpAddress.add("127.0.0.1");
-            discoverMachineEntities = getSnmpManagerPortOut().getInfoMachineEntities(dummyIpAddress);
+            if(getIpAddress().isEmpty()){
+                setIpAddress(getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254"));
+                getIpAddress().forEach(System.out::println);
+            }
+            if(getDiscoverMachineEntities().isEmpty()){
+                setDiscoverMachineEntities(getSnmpManagerPortOut().getInfoMachineEntities(getIpAddress()));
+            }
+            setDiscoverMachineEntities(getSnmpManagerPortOut().updateMachineEntities(getDiscoverMachineEntities()));
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            System.out.println("Error scanning ip : "+e.getMessage());
+        } catch (InterruptedException e) {
+            System.err.println("Error interrupt : "+e.getMessage());
         }
-        for(MachineEntity machineEntity : discoverMachineEntities){
-            System.out.println("hostname : "+machineEntity.getHostname()+" / os : "+machineEntity.getOs());
-        }
-        return discoverMachineEntities;
+        return ()->getDiscoverMachineEntities().iterator();
     }
 
 }

@@ -50,6 +50,8 @@ dependencies {
 
     //Nmap
     implementation fileTree(dir:'libs',includes: ['*.jar'])
+
+    implementation 'org.javatuples:javatuples:1.2'
 }
 
 tasks.named('test') {

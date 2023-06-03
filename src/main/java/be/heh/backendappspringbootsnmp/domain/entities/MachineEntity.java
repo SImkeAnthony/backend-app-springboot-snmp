@@ -18,4 +18,8 @@ public class MachineEntity {
     @Getter
     private final Boolean snmp;
 
+    @Override
+    public String toString(){
+        return macAddr+" : "+ipAddr+" : "+hostname+" : "+os+" : "+snmp;
+    }
 }
