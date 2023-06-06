@@ -3,7 +3,9 @@ import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.javatuples.Pair;
 import org.nmap4j.Nmap4j;
+import org.nmap4j.core.nmap.ExecutionResults;
 import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
@@ -22,8 +24,6 @@ public class DeviceScanner implements DeviceScannerPortOut {
     private final String pathNmapExecutale="C:\\Program Files (x86)\\Nmap";
     @Getter
     private Nmap4j nmap4j = new Nmap4j(pathNmapExecutale);
-    @Getter
-    private Logger logger = LoggerFactory.getLogger(DeviceScanner.class);
 
     @Override
     public List<String> getAllIpOnNetwork(String ipRange) {
@@ -44,91 +44,69 @@ public class DeviceScanner implements DeviceScannerPortOut {
                     }
                 }
             }else {
-                logger.error(nmap4j.getExecutionResults().getErrors());
+                System.err.println("Error execute nmap scan : "+nmap4j.getExecutionResults().getErrors());
             }
         }catch (NMapExecutionException | NMapInitializationException e){
             throw  new RuntimeException(e);
         }
         return ipAddress ;
     }
-
     @Override
-    public List<MachineEntity> getAllInfoOfMachines(List<String> ipAddress) throws NMapExecutionException, NMapInitializationException {
-        List<MachineEntity> machineEntities = null;
+    public MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity) {
         Nmap4j newInfoScan = new Nmap4j(pathNmapExecutale);
-        String hosts="";
-        for (String ip : ipAddress){
-            if(ipAddress.indexOf(ip)==ipAddress.size()-1){
-                hosts+=ip;
-            }else{
-                hosts+=ip+"-";
-            }
-
-        }
-        System.out.println("host scanned : "+hosts);
+        String hosts=String.join("-",machineEntity.getIpAddr());
         newInfoScan.includeHosts(hosts);
-        newInfoScan.addFlags("-O -sS");
+
+        //Get variables
+        List<String> ipAddr = machineEntity.getIpAddr();
+        Boolean snmp = false;
+        String hostname = getHostname(newInfoScan);
+        Pair<List<String>,String> pair = getMAcOs(newInfoScan);
+        List<String> macAddr = pair.getValue0();
+        String os = pair.getValue1();
+        return new MachineEntity(ipAddr,macAddr,hostname,os,snmp);
+    }
+
+    private Pair<List<String>,String> getMAcOs(Nmap4j scan){
+        scan.addFlags("-sS -PR -O");
         try{
-            newInfoScan.execute();
-            if(!newInfoScan.hasError()){
-                NMapRun run = newInfoScan.getResult();
-                List<Host> scannedHosts = run.getHosts();
-                for (Host host : scannedHosts){
-                    //display host info
-                    System.out.println(host.toString());
-
-                    //Default variables
-                    List<String> ipAddr = new ArrayList<>();
-                    List<String> macAddr =  new ArrayList<>();
-                    String hostname="unknown";
-                    String os = "unknown";
-                    Boolean snmp = false;
-
-                    //check if data exist for each host
-
-                    //Address
-                    List<Address> addressHost = host.getAddresses();
-                    if(!addressHost.isEmpty()){
-                        for (Address addr : addressHost){
-                            if(addr.getAddrtype()=="ipv4"){
-                                ipAddr.add(addr.toString());
-                            }
-                            if(addr.getAddrtype()=="mac"){
-                                macAddr.add(addr.toString());
-                            }
-                        }
-                    }
-                    //hostname
-                    if(host.getHostnames()!=null){
-                        hostname=host.getHostnames().toString();
-                    }
-                    //os
-                    if(host.getOs()!=null){
-                        os=host.getOs().toString();
-                    }
-                    //snmp
-                    List<PortUsed>usedPorts = host.getOs().getPortUseds();
-                    ArrayList<Port> ports = host.getPorts().getPorts();
-                    Port snmpPort1 = new Port();
-                    Port snmpPort2 = new Port();
-                    snmpPort1.setPortId(161);
-                    snmpPort1.setProtocol("snmp");
-                    snmpPort2.setPortId(162);
-                    snmpPort2.setProtocol("snmp");
-                    if(usedPorts.contains(snmpPort1) || ports.contains(snmpPort1) || usedPorts.contains(snmpPort2) || ports.contains(snmpPort2)){
-                        snmp = true;
-                    }
-
-                    MachineEntity machineEntity = new MachineEntity(macAddr,ipAddr,hostname,os,snmp);
-                    machineEntities.add(machineEntity);
-
-                }//end of for
+            scan.execute();
+            if(!scan.hasError()){
+                NMapRun run = scan.getResult();
+                ArrayList<Host> hosts = run.getHosts();
+                for(Host host : hosts){
+                    System.out.println("MacOs : "+host);
+                }
+                return new Pair<>(new ArrayList<>(),"");
             }else {
-                logger.error(newInfoScan.getExecutionResults().getErrors());
+                System.err.println("Error execute nmap scan : "+nmap4j.getExecutionResults().getErrors());
+                List<String> macAddr = new ArrayList<>();
+                macAddr.add("unknown");
+                return new Pair<>(macAddr,"unknown");
             }
         }catch (NMapExecutionException | NMapInitializationException e){
-            throw  new RuntimeException(e);
+            System.err.println("Error execute nmap scan : "+e.getMessage());
+            return new Pair<>(new ArrayList<>(),"unknown");
         }
-        return machineEntities ;
+    }
+    private String getHostname(Nmap4j scan){
+        scan.addFlags("-Sl");
+        try{
+            scan.execute();
+            if(!scan.hasError()){
+                NMapRun run = scan.getResult();
+                ArrayList<Host> hosts = run.getHosts();
+                for(Host host : hosts){
+                    System.out.println("Hostname : "+host);
+                }
+                return "some os";
+            }else {
+                System.err.println("Error execute nmap scan : "+nmap4j.getExecutionResults().getErrors());
+                return "unknown";
+            }
+        }catch (NMapExecutionException | NMapInitializationException e){
+            System.err.println("Error execute nmap scan : "+e.getMessage());
+            return "unknown";
+        }
     }
 }

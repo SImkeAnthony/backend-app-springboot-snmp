@@ -29,7 +29,7 @@ public class SnmpListener implements ResponseListener {
     @Override
     public <A extends Address> void onResponse(ResponseEvent<A> event) {
         ((Snmp)event.getSource()).cancel(event.getRequest(), this);
-        System.out.println("Received message : "+event.getResponse());
+        //System.out.println("Received message : "+event.getResponse());
 
         if(event.getResponse()!=null){
             if(event.getResponse().getErrorStatus() == 0){
@@ -40,15 +40,15 @@ public class SnmpListener implements ResponseListener {
                         getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
                         break;
                     default:
-                        System.err.println("The response is not supported yet");
+                        //System.err.println("The response is not supported yet");
                         addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
                 }
             }else {
-                System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
+                //System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
                 addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
             }
         } else{
-            System.out.println("host is not reachable or incompatible with SNMPv1");
+            //System.out.println("host is not reachable or incompatible with SNMPv1");
             addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
         }
         getLockResponseCounter().increment();
@@ -81,7 +81,7 @@ public class SnmpListener implements ResponseListener {
                     snmp = variableBinding.getVariable().toString().equals("true");
                     break;
                 default:
-                    System.err.println("Error OID : "+variableBinding.getOid().format()+" is not supported yet");
+                    //System.err.println("Error OID : "+variableBinding.getOid().format()+" is not supported yet");
                     break;
             }
         }

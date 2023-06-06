@@ -188,20 +188,11 @@ public class SnmpManager implements SnmpManagerPortOut {
         for(String ip:ipAddress){
             initPDU(PDU.GET);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(),Pair.with(ip,false));
-            System.out.println("send PDU : "+getPdu());
+            //System.out.println("send PDU : "+getPdu());
             getSnmp().send(getPdu(),getCommunityTarget(ip),null,getSnmpListener());
         }
         getLockResponseCounter().waitResponse();
         return getSnmpListener().getMachineEntities();
-    }
-
-    @Override
-    public List<MachineEntity> updateMachineEntities(List<MachineEntity> machineEntities) {
-        if(getSnmpListener().getMachineEntities().size()!=machineEntities.size()){
-            System.out.println("update list");
-            machineEntities = getSnmpListener().getMachineEntities();
-        }
-        return machineEntities;
     }
 
 }

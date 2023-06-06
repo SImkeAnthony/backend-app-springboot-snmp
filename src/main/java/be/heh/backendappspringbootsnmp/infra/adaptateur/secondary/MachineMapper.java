@@ -27,24 +27,22 @@ public class MachineMapper {
     public List<MachineJpaEntity> mapMachineDomainToJpa(List<MachineEntity> machineEntities){
         List<MachineJpaEntity> machineJpaEntities = new ArrayList<>();
         for (MachineEntity machineEntity:machineEntities){
-            String macAddr = "";
-            String ipAddr="";
-            //Convert list to string for macAddress
-            for (String mac:machineEntity.getMacAddr()) {
-                macAddr+=mac;
-                if(machineEntity.getMacAddr().indexOf(mac) != machineEntity.getMacAddr().size()-1){
-                    macAddr+='/';
-                }
-            }
-            //Convert list to string for ipAddress
-            for (String ip:machineEntity.getIpAddr()){
-                ipAddr+=ip;
-                if(machineEntity.getIpAddr().indexOf(ip) != machineEntity.getIpAddr().size()-1){
-                    ipAddr+='/';
-                }
-            }
+            String macAddr = String.join("/",machineEntity.getMacAddr());
+            String ipAddr= String.join("/",machineEntity.getIpAddr());
             machineJpaEntities.add(new MachineJpaEntity(macAddr,ipAddr,machineEntity.getHostname(),machineEntity.getOs(),machineEntity.getSnmp()));
         }
         return machineJpaEntities;
+    }
+
+    public MachineJpaEntity mapMachineDomainToJpa(MachineEntity machineEntity){
+        String macAddr = String.join("/",machineEntity.getMacAddr());
+        String ipAddr= String.join("/",machineEntity.getIpAddr());
+        return new MachineJpaEntity(macAddr,ipAddr,machineEntity.getHostname(),machineEntity.getOs(),machineEntity.getSnmp());
+    }
+
+    public MachineEntity mapMachineJpaToDomain(MachineJpaEntity machineJpaEntity){
+        List<String> macAddr = Arrays.asList(machineJpaEntity.getMacAdd().split("/"));
+        List<String> ipAddr = Arrays.asList(machineJpaEntity.getIpAdd().split("/"));
+        return new MachineEntity(macAddr,ipAddr,machineJpaEntity.getHostName(),machineJpaEntity.getOs(),machineJpaEntity.isSnmp());
     }
 }

@@ -26,9 +26,26 @@ public class MachinePersistanceAdaptateur implements MachinePortOut {
         setMachineJpaEntities(machineRepository.findAll());
         return machineMapper.mapMachineJpaToDomain(getMachineJpaEntities());
     }
-
     @Override
     public void registerMachineEntities(List<MachineEntity> machineEntities) {
+        try {
+            setMachineJpaEntities(machineMapper.mapMachineDomainToJpa(machineEntities));
+            machineRepository.saveAll(()->getMachineJpaEntities().iterator());
+        }catch (Exception e){
+            System.err.println("Error register entities : "+e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateMachineEntity(MachineEntity machineEntity) {
+        //get current registered machine entity
 
     }
+
+    @Override
+    public void registerMachineEntity(MachineEntity machineEntity) {
+        machineRepository.save(machineMapper.mapMachineDomainToJpa(machineEntity));
+
+    }
+
 }

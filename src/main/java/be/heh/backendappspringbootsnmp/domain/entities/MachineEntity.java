@@ -2,6 +2,7 @@ package be.heh.backendappspringbootsnmp.domain.entities;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -20,6 +21,6 @@ public class MachineEntity {
 
     @Override
     public String toString(){
-        return macAddr+" : "+ipAddr+" : "+hostname+" : "+os+" : "+snmp;
+        return String.join("/",macAddr)+" : "+String.join("/",ipAddr)+" : "+hostname+" : "+os+" : "+snmp;
     }
 }

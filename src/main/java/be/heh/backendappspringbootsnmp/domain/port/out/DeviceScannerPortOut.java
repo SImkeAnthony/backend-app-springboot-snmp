@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface DeviceScannerPortOut {
     public List<String> getAllIpOnNetwork(String ipRange) throws NMapExecutionException, NMapInitializationException;
-    public List<MachineEntity> getAllInfoOfMachines(List<String> ipAddress) throws NMapExecutionException, NMapInitializationException;
+    public MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity) throws NMapExecutionException, NMapInitializationException;
 }
