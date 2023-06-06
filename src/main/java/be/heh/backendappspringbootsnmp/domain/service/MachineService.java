@@ -68,6 +68,7 @@ public class MachineService implements MachinePortIn {
     }
     private void manageList(){
         if(!isManaged()){
+            managedUnknownHost();
             if(getRegisterMachineEntities().isEmpty()){
                 getMachinePortOut().registerMachineEntities(getDiscoverMachineEntities());
             }else{
@@ -81,6 +82,18 @@ public class MachineService implements MachinePortIn {
             }
         }
         setManaged(true);
+    }
+    private void managedUnknownHost(){
+        getDiscoverMachineEntities().parallelStream().forEach(machineEntity -> {
+            if(!machineEntity.getSnmp()){
+                int index = getDiscoverMachineEntities().indexOf(machineEntity);
+                try {
+                    getDiscoverMachineEntities().set(index,deviceScannerPortOut.getAllInfoOfMachineEntity(machineEntity));
+                } catch (NMapExecutionException | NMapInitializationException e) {
+                    System.err.println("Error completed unknown machine entity : "+e.getMessage());
+                }
+            }
+        });
     }
     private boolean alreadyRegisterByHostName(MachineEntity machineEntity){
         for(MachineEntity registerEntity : getRegisterMachineEntities()){
