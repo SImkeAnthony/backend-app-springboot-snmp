@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface MachinePortIn {
     public Iterable<MachineEntity> getAllMachineEntities() throws NMapExecutionException, NMapInitializationException, IOException;
+    public Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException;
 }

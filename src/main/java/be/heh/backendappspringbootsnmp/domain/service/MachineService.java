@@ -58,6 +58,31 @@ public class MachineService implements MachinePortIn {
         return ()->getRegisterMachineEntities().iterator();
     }
 
+    @Override
+    public Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException {
+        try{
+            Set<String> ipMerge = new HashSet<>();
+            List<String> ipScan  = getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
+            ipMerge.addAll(ipScan);
+            ipMerge.addAll(getIpAddress());
+            setIpAddress(ipMerge.stream().toList());
+            //get infos
+            updateListMachineEntities();
+            manageList();
+            setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+        } catch (IOException | NMapInitializationException | NMapExecutionException e) {
+            System.out.println("Error scanning ip : "+e.getMessage());
+        } catch (InterruptedException e) {
+            System.err.println("Error interrupt : "+e.getMessage());
+        }
+        return ()->getRegisterMachineEntities().iterator();
+    }
+
+    private void updateListMachineEntities() throws IOException, InterruptedException {
+        setRegisterMachineEntities(getMachinePortOut().getAllMachineEntities());
+        setDiscoverMachineEntities(getSnmpManagerPortOut().getInfoMachineEntities(getIpAddress()));
+    }
+
     private void completeListMachineEntities() throws IOException, InterruptedException {
         if(getRegisterMachineEntities().isEmpty()){
             setRegisterMachineEntities(getMachinePortOut().getAllMachineEntities());

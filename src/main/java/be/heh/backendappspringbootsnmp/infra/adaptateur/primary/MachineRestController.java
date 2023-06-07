@@ -24,4 +24,8 @@ public class MachineRestController {
     public Iterable<MachineEntity> getAllMachineEntities() throws IOException, NMapExecutionException, NMapInitializationException {
         return machinePortIn.getAllMachineEntities();
     }
+    @GetMapping("/scan")
+    public Iterable<MachineEntity> rescanNetwork() throws IOException, NMapExecutionException, NMapInitializationException {
+        return machinePortIn.rescanNetwork();
+    }
 }
