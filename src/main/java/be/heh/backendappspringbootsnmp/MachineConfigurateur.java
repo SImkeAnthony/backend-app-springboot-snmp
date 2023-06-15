@@ -8,6 +8,8 @@ import be.heh.backendappspringbootsnmp.domain.service.MachineService;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.responder.SnmpListener;
+import org.snmp4j.agent.MOAccess;
+import org.snmp4j.agent.mo.MOAccessImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableJpaRepositories
@@ -28,16 +32,22 @@ public class MachineConfigurateur {
     private OIDPersistanceAdaptateur oidPersistanceAdaptateur;
     private OIDMapper oidMapper;
     private SnmpListener snmpListener;
+    private Map<String, MOAccess> access = new HashMap<>();
+
+    private void completeAccess(){
+        access.put("read-only", MOAccessImpl.ACCESS_READ_ONLY);
+        access.put("write-only",MOAccessImpl.ACCESS_WRITE_ONLY);
+        access.put("read-write",MOAccessImpl.ACCESS_READ_WRITE);
+        access.put("for-notify",MOAccessImpl.ACCESS_FOR_NOTIFY);
+        access.put("read-create",MOAccessImpl.ACCESS_READ_CREATE);
+        access.put("not-accessible",MOAccessImpl.ACCESS_READ_ONLY);
+    }
 
     @Primary
     @Bean
     public MachinePortIn getMachinePortIn(){
         machinePersistanceAdaptateur = new MachinePersistanceAdaptateur(machineRepository,machineMapper);
         deviseScanner = new DeviceScanner();
-        //oidMapper = new OIDMapper();
-        //oidPersistanceAdaptateur = new OIDPersistanceAdaptateur(oidMapper);
-        //snmpListener = new SnmpListener(new ArrayList<>(),oidPersistanceAdaptateur);
-        //snmpManager = new SnmpManager(snmpListener);
         return new MachineService(machinePersistanceAdaptateur,deviseScanner,getSnmpManagerPortOut());
     }
 
@@ -46,7 +56,8 @@ public class MachineConfigurateur {
 
     @Bean
     public SnmpManagerPortOut getSnmpManagerPortOut(){
-        oidMapper = new OIDMapper();
+        completeAccess();
+        oidMapper = new OIDMapper(access);
         oidPersistanceAdaptateur = new OIDPersistanceAdaptateur(oidMapper);
         snmpListener = new SnmpListener(new ArrayList<>(),oidPersistanceAdaptateur);
 

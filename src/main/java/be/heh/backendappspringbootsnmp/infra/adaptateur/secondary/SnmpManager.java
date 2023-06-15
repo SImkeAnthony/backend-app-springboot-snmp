@@ -192,6 +192,7 @@ public class SnmpManager implements SnmpManagerPortOut {
             getSnmp().send(getPdu(),getCommunityTarget(ip),null,getSnmpListener());
         }
         getLockResponseCounter().waitResponse();
+        getSnmpListener().getMachineEntities().forEach(System.out::println);
         return getSnmpListener().getMachineEntities();
     }
 

@@ -42,11 +42,12 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:1.16.0"
     runtimeOnly 'org.postgresql:postgresql'
 
-    //Log
-    implementation "org.slf4j:slf4j-api:1.7.36"
-
     //SNMP
     implementation 'org.snmp4j:snmp4j:3.7.4'
+    implementation 'org.snmp4j:snmp4j-agent:3.6.6'
+
+    //json
+    implementation 'org.json:json:20230227'
 
     //Nmap
     implementation fileTree(dir:'libs',includes: ['*.jar'])

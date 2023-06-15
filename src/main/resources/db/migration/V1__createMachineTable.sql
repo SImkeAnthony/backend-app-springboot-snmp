@@ -1,8 +1,6 @@
-CREATE TABLE IF NOT EXISTS machine(
+CREATE TABLE IF NOT EXISTS machine_entity(
     id SERIAL PRIMARY KEY,
-    mac_addr varchar(17),
-    ip_addr varchar(15),
-    host_name varchar(256),
-    os varchar(256),
+    hostname varchar(255),
+    os varchar(255),
     snmp boolean
 );

@@ -1,15 +1,19 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
-import be.heh.backendappspringbootsnmp.domain.entities.OIDEntity;
+import be.heh.backendappspringbootsnmp.domain.entities.MOVariable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.json.JSONObject;
+import org.snmp4j.smi.OID;
+import org.snmp4j.smi.OctetString;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,35 +21,42 @@ import java.util.Objects;
 public class OIDPersistanceAdaptateur {
 
     @Getter
+    @Setter
+    JSONObject jsonObject;
+    @Getter
     private final OIDMapper oidMapper;
     @Getter
     @Setter
-    private List<OIDEntity> oidEntities = new ArrayList<>();
+    private List<MOVariable> moVariables = new ArrayList<>();
 
-    public List<OIDEntity> getOIDs(){
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("oid.txt");
-        assert inputStream != null;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+    public List<MOVariable> getMoVariablesList() {
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("oid.json");
         try {
-            List<String> oidText = new ArrayList<>();
-            String line;
-            while ((line = reader.readLine())!=null){
-                oidText.add(line);
-            }
-            return getOidMapper().mapOIDTextToOIDObject(oidText);
+            String jsonContent = new String(inputStream.readAllBytes(), StandardCharsets.ISO_8859_1);
+            setJsonObject(new JSONObject(jsonContent));
+            return formatJsonMibToMoVariables();
         } catch (IOException e) {
             System.err.println("Error IO : "+e.getMessage());
             return new ArrayList<>();
         }
     }
+    private List<MOVariable> formatJsonMibToMoVariables(){
+        List<MOVariable> moVariables = new ArrayList<>();
+        Iterator<String> keys = getJsonObject().keys();
+        while (keys.hasNext()){
+            JSONObject mo = getJsonObject().getJSONObject(keys.next());
+            moVariables.add(getOidMapper().mapJsonMOtoMOVariable(mo));
+        }
+        return moVariables;
+    }
 
     public int getIdToOid(String oid){
-        if(getOidEntities().isEmpty()){
-            setOidEntities(getOIDs());
+        if(getMoVariables().isEmpty()){
+            setMoVariables(getMoVariablesList());
         }
-        for(OIDEntity oidEntity : getOidEntities()){
-            if(Objects.equals(oidEntity.getOid(), oid)){
-                return oidEntity.getUniqueIdentifier();
+        for(MOVariable moVariable : getMoVariables()){
+            if(Objects.equals(moVariable.getOid().format(), oid)){
+                return moVariable.getId();
             }
         }
         return 0;

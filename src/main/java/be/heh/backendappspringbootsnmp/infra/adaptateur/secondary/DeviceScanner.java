@@ -83,15 +83,17 @@ public class DeviceScanner implements DeviceScannerPortOut {
                 }else{
                     ArrayList<Host> hosts = run.getHosts();
                     String os = "unknown";
-                    if(!hosts.get(0).getOs().toString().isEmpty()){
-                        System.out.println("os : "+hosts.get(0).getOs().toString());
-                    }
                     List<String> macAddresses = new ArrayList<>();
                     boolean unknownMacAddress = true;
-                    for (Address addr : hosts.get(0).getAddresses()){
-                        if(Objects.equals(addr.getAddrtype(),"mac")){
-                            macAddresses.add(addr.toString());
-                            unknownMacAddress = false;
+                    if(!hosts.isEmpty()){
+                        if(!hosts.get(0).getOs().toString().isEmpty()){
+                            System.out.println("os : "+hosts.get(0).getOs().toString());
+                        }
+                        for (Address addr : hosts.get(0).getAddresses()){
+                            if(Objects.equals(addr.getAddrtype(),"mac")){
+                                macAddresses.add(addr.toString());
+                                unknownMacAddress = false;
+                            }
                         }
                     }
                     if(unknownMacAddress){
@@ -124,8 +126,10 @@ public class DeviceScanner implements DeviceScannerPortOut {
                 }else {
                     ArrayList<Host> hosts = run.getHosts();
                     String hostname = "unknown";
-                    if(!hosts.get(0).getHostnames().getHostname().getName().isEmpty()){
-                        hostname = hosts.get(0).getHostnames().getHostname().getName();
+                    if(!hosts.isEmpty()){
+                        if(!hosts.get(0).getHostnames().getHostname().getName().isEmpty()){
+                            hostname = hosts.get(0).getHostnames().getHostname().getName();
+                        }
                     }
                     return hostname;
                 }
