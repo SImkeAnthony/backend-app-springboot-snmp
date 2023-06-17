@@ -2,7 +2,8 @@ package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineJpaEntity;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.MachineMapper;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity.MachineJpaEntity;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 @RequiredArgsConstructor
-public class MachinePersistanceAdaptateur implements MachinePortOut {
+public class MachinePersistanceAdaptater implements MachinePortOut {
 
     private final MachineRepository machineRepository;
     private final MachineMapper machineMapper;

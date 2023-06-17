@@ -6,8 +6,12 @@ import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import be.heh.backendappspringbootsnmp.domain.service.MachineService;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.MachineMapper;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.OIDMapper;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.responder.SnmpListener;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.DeviceScanner;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManager;
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +30,7 @@ public class MachineConfigurateur {
     @Autowired
     private MachineRepository machineRepository;
     private MachineMapper machineMapper=new MachineMapper();
-    private MachinePersistanceAdaptateur machinePersistanceAdaptateur;
+    private MachinePersistanceAdaptater machinePersistanceAdaptateur;
     private DeviceScanner deviseScanner;
     private SnmpManager snmpManager;
     private OIDPersistanceAdaptateur oidPersistanceAdaptateur;
@@ -46,7 +50,7 @@ public class MachineConfigurateur {
     @Primary
     @Bean
     public MachinePortIn getMachinePortIn(){
-        machinePersistanceAdaptateur = new MachinePersistanceAdaptateur(machineRepository,machineMapper);
+        machinePersistanceAdaptateur = new MachinePersistanceAdaptater(machineRepository,machineMapper);
         deviseScanner = new DeviceScanner();
         return new MachineService(machinePersistanceAdaptateur,deviseScanner,getSnmpManagerPortOut());
     }
@@ -66,7 +70,7 @@ public class MachineConfigurateur {
 
     @Bean
     public MachinePortOut getMachinePortOut(){
-        return new MachinePersistanceAdaptateur(machineRepository,machineMapper);
+        return new MachinePersistanceAdaptater(machineRepository,machineMapper);
     }
 
 }

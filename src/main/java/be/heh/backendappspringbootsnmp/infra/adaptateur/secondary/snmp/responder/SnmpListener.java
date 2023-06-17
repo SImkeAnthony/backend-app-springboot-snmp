@@ -1,4 +1,4 @@
-package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.responder;
+package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptateur;

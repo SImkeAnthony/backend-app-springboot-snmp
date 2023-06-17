@@ -22,7 +22,7 @@ public class Interface {
         setIpAddress(ipAddress);
         setMacAddress(macAddress);
     }
-    public Interface(long id,String description,String macAddress,String ipAddress){
+    public Interface(Long id,String description,String macAddress,String ipAddress){
         setId(id);
         setDescription(description);
         setIpAddress(ipAddress);

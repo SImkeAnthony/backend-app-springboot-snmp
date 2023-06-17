@@ -1,6 +1,6 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
-import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.MachineMapper;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -12,9 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
@@ -22,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class MachinePersistanceAdaptateurTest extends AbstractIntegrationTest {
+public class MachinePersistanceAdaptaterTest extends AbstractIntegrationTest {
 
     @Autowired
     private MachineRepository machineRepository;
     private MachineMapper machineMapper;
-    private MachinePersistanceAdaptateur machinePersistanceAdaptateur;
+    private MachinePersistanceAdaptater machinePersistanceAdaptateur;
 
     @Test
     @Sql({"createMachineTable.sql","insertMachine.sql"})

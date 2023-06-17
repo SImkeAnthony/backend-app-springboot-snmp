@@ -1,4 +1,4 @@
-package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.responder;
+package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

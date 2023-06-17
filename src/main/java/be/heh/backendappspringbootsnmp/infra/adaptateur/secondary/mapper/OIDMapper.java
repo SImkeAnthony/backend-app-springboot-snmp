@@ -1,4 +1,4 @@
-package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
+package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MOVariable;
 import lombok.Getter;

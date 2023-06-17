@@ -1,17 +1,14 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MOVariable;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.OIDMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.json.JSONObject;
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.OctetString;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

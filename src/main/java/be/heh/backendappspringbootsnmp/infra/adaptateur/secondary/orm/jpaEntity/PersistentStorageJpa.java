@@ -1,4 +1,4 @@
-package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm;
+package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity;
 
 import lombok.Data;
 
