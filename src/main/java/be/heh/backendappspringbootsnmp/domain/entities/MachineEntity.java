@@ -1,26 +1,64 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 public class MachineEntity {
     @Getter
-    private final List<String> macAddr;
+    @Setter
+    private Long id;
     @Getter
-    private final List<String> ipAddr;
+    @Setter
+    private String hostname;
     @Getter
-    private final String hostname;
+    @Setter
+    private String os;
     @Getter
-    private final String os;
+    @Setter
+    private Boolean snmp;
     @Getter
-    private final Boolean snmp;
+    @Setter
+    private List<Interface> interfaces = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<Processor> processors = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<PersistentStorage> persistentStorages = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<VolatileStorage> volatileStorages = new ArrayList<>();
+    @Getter
+    @Setter List<Service> services = new ArrayList<>();
+
+    public MachineEntity(String hostname,String os,Boolean snmp){
+        setHostname(hostname);
+        setOs(os);
+        setSnmp(snmp);
+    }
+    public MachineEntity(Long id,String hostname,String os,Boolean snmp){
+        setId(id);
+        setHostname(hostname);
+        setOs(os);
+        setSnmp(snmp);
+    }
+    public MachineEntity(Long id,String hostname,String os,Boolean snmp,List<Interface> interfaces,List<Processor> processors,List<PersistentStorage> persistentStorages,List<VolatileStorage> volatileStorages,List<Service> services){
+        setId(id);
+        setHostname(hostname);
+        setOs(os);
+        setSnmp(snmp);
+        setInterfaces(interfaces);
+        setProcessors(processors);
+        setPersistentStorages(persistentStorages);
+        setVolatileStorages(volatileStorages);
+        setServices(services);
+    }
 
     @Override
     public String toString(){
-        return String.join("/",macAddr)+" : "+String.join("/",ipAddr)+" : "+hostname+" : "+os+" : "+snmp;
+        return String.join(" : ",Long.toString(id),hostname,os,snmp.toString());
     }
 }

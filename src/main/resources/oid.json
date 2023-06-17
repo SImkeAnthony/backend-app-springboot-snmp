@@ -3,7 +3,7 @@
     "id": 1,
     "name": "macAddress",
     "oid": "1.3.2.3.6.2.1.1.1",
-    "maxaccess": "read-write",
+    "maxaccess": "read-only",
     "description": "this oid content the physical address"
   },
   "IP_ADDRESS": {
@@ -24,7 +24,7 @@
     "id": 4,
     "name": "os",
     "oid": "1.3.2.3.6.2.1.4.1",
-    "maxaccess": "read-write",
+    "maxaccess": "read-only",
     "description": "this oid content the operating system"
   },
   "SNMP": {
