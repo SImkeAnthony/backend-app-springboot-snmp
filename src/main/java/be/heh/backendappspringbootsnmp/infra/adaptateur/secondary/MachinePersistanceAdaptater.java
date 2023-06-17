@@ -2,9 +2,9 @@ package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.MachineMapper;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity.MachineJpaEntity;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -16,6 +16,11 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
 
     private final MachineRepository machineRepository;
     private final MachineMapper machineMapper;
+    private final InterfacePersistanceAdaptater interfacePersistanceAdaptater;
+    private final ProcessorPersistanceAdaptater processorPersistanceAdaptater;
+    private final PersistentStoragePersistanceAdaptater persistentStoragePersistanceAdaptater;
+    private final VolatileStoragePersistanceAdaptater volatileStoragePersistanceAdaptater;
+    private final ServicePersistenceAdaptater servicePersistenceAdaptater;
     @Getter
     @Setter
     private List<MachineEntity> machineEntities = new ArrayList<>();
@@ -29,11 +34,13 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
     }
     @Override
     public void registerMachineEntities(List<MachineEntity> machineEntities) {
-        try {
-            setMachineJpaEntities(machineMapper.mapMachineDomainToJpa(machineEntities));
-            machineRepository.saveAll(()->getMachineJpaEntities().iterator());
-        }catch (Exception e){
-            System.err.println("Error register entities : "+e.getMessage());
+        setMachineJpaEntities(machineMapper.mapMachineDomainToJpa(machineEntities));
+        for(MachineJpaEntity machineJpaEntity : getMachineJpaEntities()){
+            try {
+                machineRepository.save(machineJpaEntity);
+            }catch (Exception e){
+                System.err.println("Error register entities : "+e.getMessage());
+            }
         }
     }
 

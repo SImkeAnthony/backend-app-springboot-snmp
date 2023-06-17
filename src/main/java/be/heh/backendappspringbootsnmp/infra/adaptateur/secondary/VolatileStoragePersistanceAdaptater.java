@@ -1,35 +1,42 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
 import be.heh.backendappspringbootsnmp.domain.entities.VolatileStorage;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.VolatileStorageMapper;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.VolatileStorageRepository;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity.VolatileStorageJpa;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class VolatileStoragePersistanceAdaptater {
-    public List<VolatileStorageJpa> mapVolatileStorageDomainToJpa(List<VolatileStorage> volatileStorages, Long idMachine){
-        List<VolatileStorageJpa> volatileStorageJpaList = new ArrayList<>();
-        for(VolatileStorage volatileStorage : volatileStorages){
-            volatileStorageJpaList.add(mapVolatileStorageDomainToJpa(volatileStorage,idMachine));
-        }
-        return volatileStorageJpaList;
-    }
-    public List<VolatileStorage> mapVolatileStorageJpaToDomain(List<VolatileStorageJpa> volatileStorageJpaList){
-        List<VolatileStorage> volatileStorages = new ArrayList<>();
-        for(VolatileStorageJpa volatileStorageJpa : volatileStorageJpaList){
-            volatileStorages.add(mapVolatileStorageJpaToDomain(volatileStorageJpa));
-        }
-        return volatileStorages;
+    private final VolatileStorageRepository volatileStorageRepository;
+    private final VolatileStorageMapper volatileStorageMapper;
+
+    @Getter
+    @Setter
+    private List<VolatileStorage> volatileStorages = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<VolatileStorageJpa> volatileStorageJpaList = new ArrayList<>();
+
+    public List<VolatileStorage> getAllVolatileStoragesByIdMachine(Long idMachine){
+        setVolatileStorageJpaList(volatileStorageRepository.findAllByIdMachine(idMachine));
+        return volatileStorageMapper.mapVolatileStorageJpaToDomain(getVolatileStorageJpaList());
     }
 
-    public VolatileStorageJpa mapVolatileStorageDomainToJpa(VolatileStorage volatileStorage,Long idMachine){
-        if(volatileStorage.getId()!=null){
-            return new VolatileStorageJpa(volatileStorage.getId(),volatileStorage.getReference(),volatileStorage.getAvailable(),volatileStorage.getFrequency(),volatileStorage.getLatency(),idMachine);
-        }else {
-            return new VolatileStorageJpa(volatileStorage.getReference(),volatileStorage.getAvailable(),volatileStorage.getFrequency(),volatileStorage.getLatency(),idMachine);
+    public void registerVolatileStorages(List<VolatileStorage> volatileStorages,Long idMachine){
+        setVolatileStorageJpaList(volatileStorageMapper.mapVolatileStorageDomainToJpa(volatileStorages,idMachine));
+        for(VolatileStorageJpa volatileStorageJpa : getVolatileStorageJpaList()){
+            try {
+                volatileStorageRepository.save(volatileStorageJpa);
+            }catch (Exception e){
+                System.err.println("Error register entities : "+e.getMessage());
+            }
+
         }
-    }
-    public VolatileStorage mapVolatileStorageJpaToDomain(VolatileStorageJpa volatileStorageJpa){
-        return new VolatileStorage(volatileStorageJpa.getId(),volatileStorageJpa.getReference(),volatileStorageJpa.getAvailable(),volatileStorageJpa.getFrequency(),volatileStorageJpa.getLatency());
     }
 }

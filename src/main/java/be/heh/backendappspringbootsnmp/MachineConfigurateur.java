@@ -1,14 +1,14 @@
 package be.heh.backendappspringbootsnmp;
 
+import be.heh.backendappspringbootsnmp.domain.entities.Service;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import be.heh.backendappspringbootsnmp.domain.service.MachineService;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.MachineMapper;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.OIDMapper;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.MachineRepository;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.DeviceScanner;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManager;
@@ -29,8 +29,29 @@ import java.util.Map;
 public class MachineConfigurateur {
     @Autowired
     private MachineRepository machineRepository;
+    @Autowired
+    private InterfaceRepository interfaceRepository;
+    @Autowired
+    private ProcessorRepository processorRepository;
+    @Autowired
+    private PersistentStorageRepository persistentStorageRepository;
+    @Autowired
+    private VolatileStorageRepository volatileStorageRepository;
+    @Autowired
+    private ServiceRepository serviceRepository;
+
     private MachineMapper machineMapper=new MachineMapper();
-    private MachinePersistanceAdaptater machinePersistanceAdaptateur;
+    private InterfaceMapper interfaceMapper = new InterfaceMapper();
+    private ProcessorMapper processorMapper = new ProcessorMapper();
+    private PersistentStorageMapper persistentStorageMapper = new PersistentStorageMapper();
+    private VolatileStorageMapper volatileStorageMapper = new VolatileStorageMapper();
+    private ServiceMapper serviceMapper = new ServiceMapper();
+    private MachinePersistanceAdaptater machinePersistanceAdaptater;
+    private InterfacePersistanceAdaptater interfacePersistanceAdaptater;
+    private ProcessorPersistanceAdaptater processorPersistanceAdaptater;
+    private PersistentStoragePersistanceAdaptater persistentStoragePersistanceAdaptater;
+    private VolatileStoragePersistanceAdaptater volatileStoragePersistanceAdaptater;
+    private ServicePersistenceAdaptater servicePersistenceAdaptater;
     private DeviceScanner deviseScanner;
     private SnmpManager snmpManager;
     private OIDPersistanceAdaptateur oidPersistanceAdaptateur;
@@ -50,9 +71,14 @@ public class MachineConfigurateur {
     @Primary
     @Bean
     public MachinePortIn getMachinePortIn(){
-        machinePersistanceAdaptateur = new MachinePersistanceAdaptater(machineRepository,machineMapper);
+        interfacePersistanceAdaptater = new InterfacePersistanceAdaptater(interfaceRepository,interfaceMapper);
+        processorPersistanceAdaptater = new ProcessorPersistanceAdaptater(processorRepository,processorMapper);
+        persistentStoragePersistanceAdaptater = new PersistentStoragePersistanceAdaptater(persistentStorageRepository,persistentStorageMapper);
+        volatileStoragePersistanceAdaptater = new VolatileStoragePersistanceAdaptater(volatileStorageRepository,volatileStorageMapper);
+        servicePersistenceAdaptater = new ServicePersistenceAdaptater(serviceRepository,serviceMapper);
+        machinePersistanceAdaptater = new MachinePersistanceAdaptater(machineRepository,machineMapper,interfacePersistanceAdaptater,processorPersistanceAdaptater,persistentStoragePersistanceAdaptater,volatileStoragePersistanceAdaptater,servicePersistenceAdaptater);
         deviseScanner = new DeviceScanner();
-        return new MachineService(machinePersistanceAdaptateur,deviseScanner,getSnmpManagerPortOut());
+        return new MachineService(machinePersistanceAdaptater,deviseScanner,getSnmpManagerPortOut());
     }
 
     @Bean
@@ -70,7 +96,12 @@ public class MachineConfigurateur {
 
     @Bean
     public MachinePortOut getMachinePortOut(){
-        return new MachinePersistanceAdaptater(machineRepository,machineMapper);
+        interfacePersistanceAdaptater = new InterfacePersistanceAdaptater(interfaceRepository,interfaceMapper);
+        processorPersistanceAdaptater = new ProcessorPersistanceAdaptater(processorRepository,processorMapper);
+        persistentStoragePersistanceAdaptater = new PersistentStoragePersistanceAdaptater(persistentStorageRepository,persistentStorageMapper);
+        volatileStoragePersistanceAdaptater = new VolatileStoragePersistanceAdaptater(volatileStorageRepository,volatileStorageMapper);
+        servicePersistenceAdaptater = new ServicePersistenceAdaptater(serviceRepository,serviceMapper);
+        return new MachinePersistanceAdaptater(machineRepository,machineMapper,interfacePersistanceAdaptater,processorPersistanceAdaptater,persistentStoragePersistanceAdaptater,volatileStoragePersistanceAdaptater,servicePersistenceAdaptater);
     }
 
 }
