@@ -69,7 +69,7 @@ public class DeviceScanner implements DeviceScannerPortOut {
         return new MachineEntity(macAddr,ipAddr,hostname,os,snmp);
     }
 
-    private Pair<List<String>,String> getMAcOs(Nmap4j scan){
+    private String geOs(Nmap4j scan){
         scan.addFlags("-sP"); //not right flags correct this later
         try{
             scan.execute();
@@ -77,41 +77,26 @@ public class DeviceScanner implements DeviceScannerPortOut {
                 NMapRun run = scan.getResult();
                 if(run==null){
                     System.err.println("Error execute nmap scan : result is null");
-                    List<String> macAddr = new ArrayList<>();
-                    macAddr.add("unknown");
-                    return new Pair<>(macAddr,"unknown");
+                    return "unknown";
                 }else{
                     ArrayList<Host> hosts = run.getHosts();
                     String os = "unknown";
-                    List<String> macAddresses = new ArrayList<>();
-                    boolean unknownMacAddress = true;
                     if(!hosts.isEmpty()){
                         if(!hosts.get(0).getOs().toString().isEmpty()){
                             System.out.println("os : "+hosts.get(0).getOs().toString());
+                            os = hosts.get(0).getOs().toString();
                         }
-                        for (Address addr : hosts.get(0).getAddresses()){
-                            if(Objects.equals(addr.getAddrtype(),"mac")){
-                                macAddresses.add(addr.toString());
-                                unknownMacAddress = false;
-                            }
-                        }
+
                     }
-                    if(unknownMacAddress){
-                        macAddresses.add("unknown");
-                    }
-                    return new Pair<>(macAddresses,os);
+                    return os;
                 }
             }else {
                 System.err.println("Error execute nmap scan : "+nmap4j.getExecutionResults().getErrors());
-                List<String> macAddr = new ArrayList<>();
-                macAddr.add("unknown");
-                return new Pair<>(macAddr,"unknown");
+                return "unknown";
             }
         }catch (NMapExecutionException | NMapInitializationException | NullPointerException e){
             System.err.println("Error execute nmap scan : "+e.getMessage());
-            List<String> macAddr = new ArrayList<>();
-            macAddr.add("unknown");
-            return new Pair<>(macAddr,"unknown");
+            return "unknown";
         }
     }
     private String getHostname(Nmap4j scan){
