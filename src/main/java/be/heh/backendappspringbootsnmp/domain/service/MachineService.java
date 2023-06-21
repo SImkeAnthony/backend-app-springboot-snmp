@@ -100,8 +100,6 @@ public class MachineService implements MachinePortIn {
                 for (MachineEntity discoverEntity : getDiscoverMachineEntities()){
                     if(!Objects.equals(discoverEntity.getHostname(),"unknown") && !alreadyRegisterByHostName(discoverEntity)){
                         getMachinePortOut().registerMachineEntity(discoverEntity);
-                    }else if (!discoverEntity.getMacAddr().contains("unknown") && !alreadyRegisterByMacAddr(discoverEntity)){
-                        getMachinePortOut().registerMachineEntity(discoverEntity);
                     }
                 }
             }
@@ -113,7 +111,8 @@ public class MachineService implements MachinePortIn {
             if(!machineEntity.getSnmp()){
                 int index = getDiscoverMachineEntities().indexOf(machineEntity);
                 try {
-                    getDiscoverMachineEntities().set(index,deviceScannerPortOut.getAllInfoOfMachineEntity(machineEntity));
+                    List<String> ipAddress = new ArrayList<>();
+                    getDiscoverMachineEntities().set(index,deviceScannerPortOut.getAllInfoOfMachineEntity(machineEntity,ipAddress));
                 } catch (NMapExecutionException | NMapInitializationException e) {
                     System.err.println("Error completed unknown machine entity : "+e.getMessage());
                 }
@@ -124,31 +123,6 @@ public class MachineService implements MachinePortIn {
         for(MachineEntity registerEntity : getRegisterMachineEntities()){
             if(Objects.equals(registerEntity.getHostname(),machineEntity.getHostname())){
                 return true;
-            }
-        }
-        return false;
-    }
-    private boolean alreadyRegisterByMacAddr(MachineEntity machineEntity){
-        for(MachineEntity registerEntity : getRegisterMachineEntities()){
-            if(!Collections.disjoint(registerEntity.getMacAddr(),machineEntity.getMacAddr())){
-                if(Objects.equals(registerEntity.toString(),machineEntity.toString())){
-                    return true;
-                }else{
-                    //update list address
-                    Set<String> updateMacAddresses = new HashSet<>(registerEntity.getMacAddr());
-                    updateMacAddresses.addAll(machineEntity.getMacAddr());
-                    Set<String> updateIpAddresses = new HashSet<>(registerEntity.getIpAddr());
-                    updateIpAddresses.addAll(machineEntity.getIpAddr());
-
-                    //update entity
-                    getMachinePortOut().updateMachineEntity(new MachineEntity(
-                            updateMacAddresses.stream().toList(),
-                            updateIpAddresses.stream().toList(),
-                            machineEntity.getHostname(),
-                            machineEntity.getOs(),
-                            machineEntity.getSnmp()
-                    ));
-                }
             }
         }
         return false;

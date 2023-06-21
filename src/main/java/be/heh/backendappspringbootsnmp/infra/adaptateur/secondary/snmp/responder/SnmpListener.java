@@ -1,7 +1,7 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptateur;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,7 +19,7 @@ public class SnmpListener implements ResponseListener {
     @Getter
     private final List<MachineEntity> machineEntities;
     @Getter
-    private final OIDPersistanceAdaptateur oidPersistanceAdaptateur;
+    private final OIDPersistanceAdaptater oidPersistanceAdaptater;
     @Getter
     private Map<Integer, Pair<String, Boolean>> requestController = new HashMap<>();
     @Setter
@@ -61,7 +61,7 @@ public class SnmpListener implements ResponseListener {
         String os = "";
         boolean snmp = false;
         for(VariableBinding variableBinding : workedList){
-            int id = getOidPersistanceAdaptateur().getIdToOid(variableBinding.getOid().format());
+            int id = getOidPersistanceAdaptater().getIdToOid(variableBinding.getOid().format());
             switch (id){
                 case 1:
                     String[] macAddresses = variableBinding.getVariable().toString().split("/");
@@ -85,15 +85,11 @@ public class SnmpListener implements ResponseListener {
                     break;
             }
         }
-        MachineEntity machineEntity = new MachineEntity(macAddress,ipAddress,hostname,os,snmp);
+        MachineEntity machineEntity = new MachineEntity(hostname,os,snmp);
         getMachineEntities().add(machineEntity);
     }
 
     private void addUnknownMachineEntity(String ipAddr){
-        List<String> ipAddress = new ArrayList<>();
-        ipAddress.add(ipAddr);
-        List<String> macAddress = new ArrayList<>();
-        macAddress.add("unknown");
-        getMachineEntities().add(new MachineEntity(macAddress,ipAddress,"unknown","unknown",false));
+        getMachineEntities().add(new MachineEntity("unknown","unknown",false));
     }
 }

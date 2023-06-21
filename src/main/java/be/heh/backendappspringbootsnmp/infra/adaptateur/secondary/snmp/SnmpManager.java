@@ -107,7 +107,7 @@ public class SnmpManager implements SnmpManagerPortOut {
         getSnmp().setLocalEngine(localEngineID.getValue(),0,0);
         getSnmp().listen();
     }
-    private void initOIDs(){
+    private void initOIDsForMachineEntity(){
         getOIDs().clear();
         getOIDs().add("1.3.2.3.6.2.1.1.1");
         getOIDs().add("1.3.2.3.6.2.1.2.1");
@@ -116,7 +116,6 @@ public class SnmpManager implements SnmpManagerPortOut {
         getOIDs().add("1.3.2.3.6.2.1.5.1");
     }
     private void initPDU(int pduType){
-        initOIDs();
         setPdu(new PDU());
         for(String oid:getOIDs()){
             getPdu().add(new VariableBinding(new OID(oid)));
@@ -130,7 +129,6 @@ public class SnmpManager implements SnmpManagerPortOut {
         }
     }
     private void initScopedPDU(int scopedPduType){
-        initOIDs();
         setScopedPDU(new ScopedPDU());
         for(String oid:getOIDs()){
             getScopedPDU().add(new VariableBinding(new OID(oid)));
@@ -158,7 +156,7 @@ public class SnmpManager implements SnmpManagerPortOut {
         return target;
     }
     private Target<Address> getUserTargetV3(String ip){
-        initOIDs();
+        initOIDsForMachineEntity();
         //create a target
         Address address = GenericAddress.parse(String.format("udp:%s/%s",ip , getPort()));
         Target<Address> userTarget = new UserTarget<>();
@@ -177,6 +175,7 @@ public class SnmpManager implements SnmpManagerPortOut {
         if(!getSnmpListener().getMachineEntities().isEmpty()){
             getSnmpListener().getMachineEntities().clear();
         }
+        initOIDsForMachineEntity();
         //initialize Locker
         setLockResponseCounter(new LockResponseCounter(ipAddress.size()));
         getSnmpListener().setLockResponseCounter(getLockResponseCounter());

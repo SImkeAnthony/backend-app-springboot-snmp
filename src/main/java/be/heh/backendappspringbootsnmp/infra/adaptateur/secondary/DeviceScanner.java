@@ -53,23 +53,20 @@ public class DeviceScanner implements DeviceScannerPortOut {
         return ipAddress ;
     }
     @Override
-    public MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity) {
-        Nmap4j scanMacOs = new Nmap4j(pathNmapExecutale);
+    public MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity,List<String> ipAddress) {
+        Nmap4j scanOs = new Nmap4j(pathNmapExecutale);
         Nmap4j scanHostname = new Nmap4j(pathNmapExecutale);
-        String hosts=String.join("-",machineEntity.getIpAddr());
-        scanMacOs.includeHosts(hosts);
+        String hosts=String.join("-",ipAddress);
+        scanOs.includeHosts(hosts);
         scanHostname.includeHosts(hosts);
         //Get variables
-        List<String> ipAddr = machineEntity.getIpAddr();
         Boolean snmp = machineEntity.getSnmp();
-        String hostname = getHostname(scanHostname);
-        Pair<List<String>,String> pair = getMAcOs(scanMacOs);
-        List<String> macAddr = pair.getValue0();
-        String os = pair.getValue1();
-        return new MachineEntity(macAddr,ipAddr,hostname,os,snmp);
+        machineEntity.setOs(getOs(scanOs));
+        machineEntity.setHostname(getHostname(scanHostname));
+        return machineEntity;
     }
 
-    private String geOs(Nmap4j scan){
+    private String getOs(Nmap4j scan){
         scan.addFlags("-sP"); //not right flags correct this later
         try{
             scan.execute();

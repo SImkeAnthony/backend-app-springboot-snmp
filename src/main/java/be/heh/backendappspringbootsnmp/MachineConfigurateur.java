@@ -1,6 +1,5 @@
 package be.heh.backendappspringbootsnmp;
 
-import be.heh.backendappspringbootsnmp.domain.entities.Service;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
@@ -9,6 +8,7 @@ import be.heh.backendappspringbootsnmp.domain.service.MachineService;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.MibBrowser;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.DeviceScanner;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManager;
@@ -54,8 +54,8 @@ public class MachineConfigurateur {
     private ServicePersistenceAdaptater servicePersistenceAdaptater;
     private DeviceScanner deviseScanner;
     private SnmpManager snmpManager;
-    private OIDPersistanceAdaptateur oidPersistanceAdaptateur;
-    private OIDMapper oidMapper;
+    private OIDPersistanceAdaptater oidPersistanceAdaptateur;
+    private MibBrowser mibBrowser;
     private SnmpListener snmpListener;
     private Map<String, MOAccess> access = new HashMap<>();
 
@@ -87,8 +87,8 @@ public class MachineConfigurateur {
     @Bean
     public SnmpManagerPortOut getSnmpManagerPortOut(){
         completeAccess();
-        oidMapper = new OIDMapper(access);
-        oidPersistanceAdaptateur = new OIDPersistanceAdaptateur(oidMapper);
+        mibBrowser = new MibBrowser(access);
+        oidPersistanceAdaptateur = new OIDPersistanceAdaptater(mibBrowser);
         snmpListener = new SnmpListener(new ArrayList<>(),oidPersistanceAdaptateur);
 
         return new SnmpManager(snmpListener);
