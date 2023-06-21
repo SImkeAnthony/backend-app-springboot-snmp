@@ -98,7 +98,7 @@ public class MachineService implements MachinePortIn {
                 getMachinePortOut().registerMachineEntities(getDiscoverMachineEntities());
             }else{
                 for (MachineEntity discoverEntity : getDiscoverMachineEntities()){
-                    if(!Objects.equals(discoverEntity.getHostname(),"unknown") && !alreadyRegisterByHostName(discoverEntity)){
+                    if(!Objects.equals(discoverEntity.getHostname(),"unknown") && !alreadyRegisterByHostname(discoverEntity)){
                         getMachinePortOut().registerMachineEntity(discoverEntity);
                     }
                 }
@@ -119,7 +119,7 @@ public class MachineService implements MachinePortIn {
             }
         });
     }
-    private boolean alreadyRegisterByHostName(MachineEntity machineEntity){
+    private boolean alreadyRegisterByHostname(MachineEntity machineEntity){
         for(MachineEntity registerEntity : getRegisterMachineEntities()){
             if(Objects.equals(registerEntity.getHostname(),machineEntity.getHostname())){
                 return true;

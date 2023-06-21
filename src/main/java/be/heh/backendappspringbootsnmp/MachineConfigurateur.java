@@ -91,7 +91,7 @@ public class MachineConfigurateur {
         oidPersistanceAdaptateur = new OIDPersistanceAdaptater(mibBrowser);
         snmpListener = new SnmpListener(new ArrayList<>(),oidPersistanceAdaptateur);
 
-        return new SnmpManager(snmpListener);
+        return new SnmpManager(snmpListener,oidPersistanceAdaptateur);
     }
 
     @Bean

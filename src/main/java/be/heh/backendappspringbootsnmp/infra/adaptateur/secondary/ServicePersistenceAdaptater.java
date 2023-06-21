@@ -13,7 +13,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class ServicePersistenceAdaptater {
+    @Getter
     private final ServiceRepository serviceRepository;
+    @Getter
     private final ServiceMapper serviceMapper;
 
     @Getter

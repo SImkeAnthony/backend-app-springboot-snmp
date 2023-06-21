@@ -13,7 +13,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class VolatileStoragePersistanceAdaptater {
+    @Getter
     private final VolatileStorageRepository volatileStorageRepository;
+    @Getter
     private final VolatileStorageMapper volatileStorageMapper;
 
     @Getter

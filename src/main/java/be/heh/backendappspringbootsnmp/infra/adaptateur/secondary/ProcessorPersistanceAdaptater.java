@@ -13,7 +13,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class ProcessorPersistanceAdaptater {
+    @Getter
     private final ProcessorRepository processorRepository;
+    @Getter
     private final ProcessorMapper processorMapper;
 
     @Getter

@@ -10,6 +10,7 @@ import org.snmp4j.Snmp;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.event.ResponseListener;
 import org.snmp4j.smi.Address;
+import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 
 import java.util.*;
@@ -22,20 +23,29 @@ public class SnmpListener implements ResponseListener {
     private final OIDPersistanceAdaptater oidPersistanceAdaptater;
     @Getter
     private Map<Integer, Pair<String, Boolean>> requestController = new HashMap<>();
+    @Getter
+    private Map<String, Integer> managerController = new HashMap<>();
     @Setter
     @Getter
     private LockResponseCounter lockResponseCounter;
+    @Getter
+    private List<VariableBinding> systemVariableBindings = new ArrayList<>();
+    @Getter
+    private List<VariableBinding> interfacesVariableBindings = new ArrayList<>();
+    @Getter
+    private List<VariableBinding> materialsVariableBindings = new ArrayList<>();
+    @Getter
+    private List<VariableBinding> servicesVariableBindings = new ArrayList<>();
 
     @Override
     public <A extends Address> void onResponse(ResponseEvent<A> event) {
         ((Snmp)event.getSource()).cancel(event.getRequest(), this);
         //System.out.println("Received message : "+event.getResponse());
-
         if(event.getResponse()!=null){
             if(event.getResponse().getErrorStatus() == 0){
+                dispatchVariableBindings(event.getResponse().getVariableBindings());
                 switch (event.getResponse().getVariableBindings().size()){
                     case 5:
-                        responseSomeInfoMachineEntities(event);
                         Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
                         getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
                         break;
@@ -53,40 +63,34 @@ public class SnmpListener implements ResponseListener {
         }
         getLockResponseCounter().increment();
     }
-    private void responseSomeInfoMachineEntities(ResponseEvent event){
-        List<? extends VariableBinding> workedList = event.getResponse().getVariableBindings();
-        List<String> ipAddress = new ArrayList<>();
-        List<String> macAddress = new ArrayList<>();
-        String hostname  = "";
-        String os = "";
-        boolean snmp = false;
-        for(VariableBinding variableBinding : workedList){
-            int id = getOidPersistanceAdaptater().getIdToOid(variableBinding.getOid().format());
-            switch (id){
-                case 1:
-                    String[] macAddresses = variableBinding.getVariable().toString().split("/");
-                    macAddress.addAll(Arrays.asList(macAddresses));
-                    break;
-                case 2:
-                    String[] ipAddresses = variableBinding.getVariable().toString().split("/");
-                    ipAddress.addAll(Arrays.asList(ipAddresses));
-                    break;
-                case 3:
-                    hostname = variableBinding.getVariable().toString();
-                    break;
-                case 4:
-                    os = variableBinding.getVariable().toString();
-                    break;
-                case 5:
-                    snmp = variableBinding.getVariable().toString().equals("true");
-                    break;
-                default:
-                    //System.err.println("Error OID : "+variableBinding.getOid().format()+" is not supported yet");
-                    break;
-            }
-        }
-        MachineEntity machineEntity = new MachineEntity(hostname,os,snmp);
-        getMachineEntities().add(machineEntity);
+
+    private void dispatchVariableBindings(List<?extends VariableBinding> variableBindings){
+        clearVariableBindings();
+        variableBindings.forEach(variableBinding -> {
+            getOidPersistanceAdaptater().getMoManagers().forEach(moManager -> {
+                if(variableBinding.getOid().format().contains(moManager.getOidRoot())){
+                    switch (getManagerController().get(moManager.getName())){
+                        case 1:{getSystemVariableBindings().add(variableBinding);}
+                        case 2:{getInterfacesVariableBindings().add(variableBinding);}
+                        case 3:{getMaterialsVariableBindings().add(variableBinding);}
+                        case 4:{getServicesVariableBindings().add(variableBinding);}
+                        default:{System.err.println("the variables "+variableBinding.getOid()+" can't be dispatched in list because is not be supported");}
+                    }
+                }
+            });
+        });
+    }
+    private void clearVariableBindings(){
+        getSystemVariableBindings().clear();
+        getInterfacesVariableBindings().clear();
+        getMaterialsVariableBindings().clear();
+        getServicesVariableBindings().clear();
+    }
+    private void initManagerController(){
+        getManagerController().put("system",1);
+        getManagerController().put("interfaces",2);
+        getManagerController().put("materials",3);
+        getManagerController().put("services",4);
     }
 
     private void addUnknownMachineEntity(String ipAddr){

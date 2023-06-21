@@ -30,7 +30,15 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
     @Override
     public List<MachineEntity> getAllMachineEntities() {
         setMachineJpaEntities(machineRepository.findAll());
-        return machineMapper.mapMachineJpaToDomain(getMachineJpaEntities());
+        setMachineEntities(machineMapper.mapMachineJpaToDomain(getMachineJpaEntities()));
+        getMachineEntities().forEach(machine->{
+            machine.setInterfaces(interfacePersistanceAdaptater.getAllInterfacesByIdMachine(machine.getId()));
+            machine.setProcessors(processorPersistanceAdaptater.getAllProcessorsByIdMachine(machine.getId()));
+            machine.setPersistentStorages(persistentStoragePersistanceAdaptater.getAllPersistentStoragesByIdMachine(machine.getId()));
+            machine.setVolatileStorages(volatileStoragePersistanceAdaptater.getAllVolatileStoragesByIdMachine(machine.getId()));
+            machine.setServices(servicePersistenceAdaptater.getAllServiceByIdMachine(machine.getId()));
+        });
+        return getMachineEntities();
     }
     @Override
     public void registerMachineEntities(List<MachineEntity> machineEntities) {
@@ -47,7 +55,6 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
     @Override
     public void updateMachineEntity(MachineEntity machineEntity) {
         //get current registered machine entity
-
     }
 
     @Override

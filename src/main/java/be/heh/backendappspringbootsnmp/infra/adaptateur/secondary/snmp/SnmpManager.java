@@ -2,6 +2,7 @@ package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockResponseCounter;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import lombok.Getter;
@@ -57,6 +58,8 @@ public class SnmpManager implements SnmpManagerPortOut {
     @Getter
     private final SnmpListener snmpListener;
     @Getter
+    private final OIDPersistanceAdaptater oidPersistanceAdaptater;
+    @Getter
     @Setter
     private LockResponseCounter lockResponseCounter;
 
@@ -107,13 +110,15 @@ public class SnmpManager implements SnmpManagerPortOut {
         getSnmp().setLocalEngine(localEngineID.getValue(),0,0);
         getSnmp().listen();
     }
-    private void initOIDsForMachineEntity(){
+    private void initOIDForSystem(){
         getOIDs().clear();
-        getOIDs().add("1.3.2.3.6.2.1.1.1");
-        getOIDs().add("1.3.2.3.6.2.1.2.1");
-        getOIDs().add("1.3.2.3.6.2.1.3.1");
-        getOIDs().add("1.3.2.3.6.2.1.4.1");
-        getOIDs().add("1.3.2.3.6.2.1.5.1");
+        oidPersistanceAdaptater.getMoManagers().forEach(moManager -> {
+            if(moManager.getName().equals("system")){
+                if(!moManager.getMoVariables().isEmpty()){
+                    moManager.getMoVariables().forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+                }
+            }
+        });
     }
     private void initPDU(int pduType){
         setPdu(new PDU());
@@ -156,7 +161,6 @@ public class SnmpManager implements SnmpManagerPortOut {
         return target;
     }
     private Target<Address> getUserTargetV3(String ip){
-        initOIDsForMachineEntity();
         //create a target
         Address address = GenericAddress.parse(String.format("udp:%s/%s",ip , getPort()));
         Target<Address> userTarget = new UserTarget<>();
@@ -170,25 +174,34 @@ public class SnmpManager implements SnmpManagerPortOut {
         return userTarget;
     }
     @Override
-    public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress) throws IOException, InterruptedException {
-        initSnmpV1();
-        if(!getSnmpListener().getMachineEntities().isEmpty()){
-            getSnmpListener().getMachineEntities().clear();
-        }
-        initOIDsForMachineEntity();
-        //initialize Locker
-        setLockResponseCounter(new LockResponseCounter(ipAddress.size()));
-        getSnmpListener().setLockResponseCounter(getLockResponseCounter());
-        //send request
-        for(String ip:ipAddress){
-            initPDU(PDU.GET);
-            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(),Pair.with(ip,false));
-            //System.out.println("send PDU : "+getPdu());
-            getSnmp().send(getPdu(),getCommunityTarget(ip),null,getSnmpListener());
-        }
-        getLockResponseCounter().waitResponse();
-        getSnmpListener().getMachineEntities().forEach(System.out::println);
+    public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress){
+        completeMachineEntitiesWithSystemVariables(ipAddress);
+
         return getSnmpListener().getMachineEntities();
+    }
+
+    public void completeMachineEntitiesWithSystemVariables(List<String> ipAddress){
+        try{
+            initSnmpV1();
+            if(!getSnmpListener().getMachineEntities().isEmpty()){
+                getSnmpListener().getMachineEntities().clear();
+            }
+            initOIDForSystem();
+            //initialize Locker
+            setLockResponseCounter(new LockResponseCounter(ipAddress.size()));
+            getSnmpListener().setLockResponseCounter(getLockResponseCounter());
+            //send request
+            for(String ip:ipAddress){
+                initPDU(PDU.GET);
+                getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(),Pair.with(ip,false));
+                //System.out.println("send PDU : "+getPdu());
+                getSnmp().send(getPdu(),getCommunityTarget(ip),null,getSnmpListener());
+            }
+            getLockResponseCounter().waitResponse();
+            getSnmpListener().getMachineEntities().forEach(System.out::println);
+        }catch (IOException | InterruptedException e){
+            System.err.println("Error to compete system variable : "+e.getMessage());
+        }
     }
 
 }

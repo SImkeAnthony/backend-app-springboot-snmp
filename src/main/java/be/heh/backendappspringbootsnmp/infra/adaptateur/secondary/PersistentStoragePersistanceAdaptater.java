@@ -13,7 +13,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class PersistentStoragePersistanceAdaptater {
+    @Getter
     private final PersistentStorageRepository persistentStorageRepository;
+    @Getter
     private final PersistentStorageMapper persistentStorageMapper;
 
     @Getter

@@ -13,7 +13,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class InterfacePersistanceAdaptater {
+    @Getter
     private final InterfaceRepository interfaceRepository;
+    @Getter
     private final InterfaceMapper interfaceMapper;
 
     @Getter
