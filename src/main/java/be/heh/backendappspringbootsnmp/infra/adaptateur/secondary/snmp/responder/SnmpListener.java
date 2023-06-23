@@ -1,16 +1,17 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder;
 
-import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
+import be.heh.backendappspringbootsnmp.domain.entities.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.javatuples.Pair;
+import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.event.ResponseListener;
 import org.snmp4j.smi.Address;
-import org.snmp4j.smi.Variable;
+import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
 
 import java.util.*;
@@ -28,6 +29,21 @@ public class SnmpListener implements ResponseListener {
     @Setter
     @Getter
     private LockResponseCounter lockResponseCounter;
+    @Setter
+    @Getter
+    private int ifNumber;
+    @Setter
+    @Getter
+    private int mProcessorNumber;
+    @Setter
+    @Getter
+    private int mPersiStorageNumber;
+    @Setter
+    @Getter
+    private int mVolStorageNumber;
+    @Setter
+    @Getter
+    private int mServiceNumber;
     @Getter
     private List<VariableBinding> systemVariableBindings = new ArrayList<>();
     @Getter
@@ -44,14 +60,29 @@ public class SnmpListener implements ResponseListener {
         if(event.getResponse()!=null){
             if(event.getResponse().getErrorStatus() == 0){
                 dispatchVariableBindings(event.getResponse().getVariableBindings());
-                switch (event.getResponse().getVariableBindings().size()){
-                    case 5:
-                        Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
-                        getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
-                        break;
-                    default:
-                        //System.err.println("The response is not supported yet");
-                        addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
+                if(!getSystemVariableBindings().isEmpty()){
+                    processSystemVariableBindings(event.getResponse());
+                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
+                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                }
+                if(!getInterfacesVariableBindings().isEmpty()){
+                    processInterfacesVariableBindings(event.getResponse());
+                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
+                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                }
+                if(!getMaterialsVariableBindings().isEmpty()){
+                    processMaterialsVariableBindings(event.getResponse());
+                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
+                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                }
+                if(getServicesVariableBindings().isEmpty()){
+                    processServicesVariableBindings(event.getResponse());
+                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
+                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                }
+                else{
+                    //System.err.println("The response is not supported yet");
+                    addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
                 }
             }else {
                 //System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
@@ -65,6 +96,7 @@ public class SnmpListener implements ResponseListener {
     }
 
     private void dispatchVariableBindings(List<?extends VariableBinding> variableBindings){
+        initManagerController();
         clearVariableBindings();
         variableBindings.forEach(variableBinding -> {
             getOidPersistanceAdaptater().getMoManagers().forEach(moManager -> {
@@ -87,13 +119,72 @@ public class SnmpListener implements ResponseListener {
         getServicesVariableBindings().clear();
     }
     private void initManagerController(){
-        getManagerController().put("system",1);
-        getManagerController().put("interfaces",2);
-        getManagerController().put("materials",3);
-        getManagerController().put("services",4);
+        if(getManagerController().isEmpty()){
+            getManagerController().put("system",1);
+            getManagerController().put("interfaces",2);
+            getManagerController().put("materials",3);
+            getManagerController().put("services",4);
+        }
     }
 
     private void addUnknownMachineEntity(String ipAddr){
         getMachineEntities().add(new MachineEntity("unknown","unknown",false));
     }
+    private void processSystemVariableBindings(PDU pdu){
+
+    }
+    private void processInterfacesVariableBindings(PDU pdu){
+        String ifNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue0();
+        String ifIndexOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue1();
+        pdu.getVariableBindings().forEach(variableBinding -> {
+            if(variableBinding.getOid().format().equals(ifNumberOID)){
+                setIfNumber(variableBinding.getVariable().toInt());
+            }else if(variableBinding.getOid().format().equals(ifIndexOID)){
+                addInterface(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+            }else{
+                System.err.println("Error can't supported the pdu received : "+pdu);
+            }
+        });
+    }
+    private void processMaterialsVariableBindings(PDU pdu){
+
+    }
+    private void processServicesVariableBindings(PDU pdu){
+
+    }
+    private void addInterface(String hostname,List<? extends VariableBinding> parameters){
+        parameters.forEach(variableBinding -> {
+            String oid = variableBinding.getOid().format();
+            MOManager ifManager = getOidPersistanceAdaptater().getMOManagerByName("interfaces");
+            Interface domainInterface = new Interface("","","");
+            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifDescription",ifManager))){
+                domainInterface.setDescription(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifPhysAddress",ifManager))){
+                domainInterface.setMacAddress(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifAddress",ifManager))){
+                domainInterface.setIpAddress(variableBinding.getVariable().toString());
+            }else {
+                System.err.println("Error can't supported OID "+oid+" to add interface");
+            }
+            if(domainInterface.getDescription().isEmpty() || domainInterface.getMacAddress().isEmpty() || domainInterface.getIpAddress().isEmpty()){}
+            else {
+                getMachineEntities().forEach(machineEntity -> {
+                    if(machineEntity.getHostname().equals(hostname)){
+                        machineEntity.getInterfaces().add(domainInterface);
+                    }
+                });
+            }
+        });
+    }
+
+    private String getHostnameFromVariableBindings(List<? extends VariableBinding> variableBindings){
+        for(VariableBinding variableBinding : variableBindings){
+            if(variableBinding.getOid().equals(getOidPersistanceAdaptater().getOIDHostname())){
+                return variableBinding.getVariable().toString();
+            }
+        }
+        return "default";
+    }
+
+
 }

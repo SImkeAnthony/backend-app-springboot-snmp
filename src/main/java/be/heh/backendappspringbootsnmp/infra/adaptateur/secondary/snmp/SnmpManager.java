@@ -1,5 +1,8 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp;
 
+import be.heh.backendappspringbootsnmp.domain.entities.MOManager;
+import be.heh.backendappspringbootsnmp.domain.entities.MOTable;
+import be.heh.backendappspringbootsnmp.domain.entities.MOVariable;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
@@ -19,6 +22,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.snmp4j.util.DefaultPDUFactory;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,7 +131,7 @@ public class SnmpManager implements SnmpManagerPortOut {
         }
         getPdu().setType(pduType);
         getPdu().setRequestID(new Integer32(getRequestID()));
-        if(getRequestID()>10000){setRequestID(0);}
+        if(getRequestID()>10000){setRequestID(0);getSnmpListener().getRequestController().clear();}
         setRequestID(getRequestID()+1);
         if(getPdu().getErrorStatus()!=0){
             System.err.println("Error pdu : "+getPdu().getErrorStatus()+" => "+getPdu().getErrorStatusText());
@@ -179,8 +183,52 @@ public class SnmpManager implements SnmpManagerPortOut {
 
         return getSnmpListener().getMachineEntities();
     }
+    private int getInterfaceNumber(String ipAddress){
+        try{
+            initSnmpV1();
+            getOIDs().clear();
+            getOIDs().add(oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue0());
+            getOIDs().add(oidPersistanceAdaptater.getOIDHostname());
+            setLockResponseCounter(new LockResponseCounter(1));
+            getSnmpListener().setLockResponseCounter(getLockResponseCounter());
+            initPDU(PDU.GET);
+            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(),Pair.with(ipAddress,false));
+            getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
+            getLockResponseCounter().waitResponse();
+            getSnmp().close();
+            return getSnmpListener().getIfNumber();
+        }catch (IOException | InterruptedException e){
+            System.err.println("Error to get ifNumber : "+e.getMessage());
+            return 0;
+        }
+    }
+    private void completeInterface(int index,String ipAddress){
+        try{
+            initSnmpV1();
+            getOIDs().clear();
+            getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
+            getOidPersistanceAdaptater().getColumnOfTable("ifTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+            initPDU(PDU.GET);
+            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue0()),String.valueOf(index)));
+            setLockResponseCounter(new LockResponseCounter(1));
+            getSnmpListener().setLockResponseCounter(getLockResponseCounter());
+            initPDU(PDU.GET);
+            getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
+            getLockResponseCounter().waitResponse();
+        }catch (IOException | ParseException | InterruptedException e) {
+            System.err.println("Error compete interface : "+e.getMessage());
+        }
+    }
+    private void competeInterfaceForMachineEntity(String ipAddress){
+        int ifNumber = getInterfaceNumber(ipAddress);
+        for(int i = 0;i<ifNumber;i++){
+            completeInterface(i,ipAddress);
+        }
+    }
+    private void completeInterfacesForEachMachineEntities(List<String> ipAddress){
 
-    public void completeMachineEntitiesWithSystemVariables(List<String> ipAddress){
+    }
+    private void completeMachineEntitiesWithSystemVariables(List<String> ipAddress){
         try{
             initSnmpV1();
             if(!getSnmpListener().getMachineEntities().isEmpty()){
@@ -198,6 +246,7 @@ public class SnmpManager implements SnmpManagerPortOut {
                 getSnmp().send(getPdu(),getCommunityTarget(ip),null,getSnmpListener());
             }
             getLockResponseCounter().waitResponse();
+            getSnmp().close();
             getSnmpListener().getMachineEntities().forEach(System.out::println);
         }catch (IOException | InterruptedException e){
             System.err.println("Error to compete system variable : "+e.getMessage());
