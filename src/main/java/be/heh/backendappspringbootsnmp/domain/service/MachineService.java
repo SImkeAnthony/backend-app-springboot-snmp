@@ -46,10 +46,11 @@ public class MachineService implements MachinePortIn {
                 //scan network
                 setIpAddress(getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254"));
             }
+            getIpAddress().forEach(System.out::println);
             //get infos
             completeListMachineEntities();
-            manageList();
-            setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+            //manageList();
+            //setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             System.out.println("Error scanning ip : "+e.getMessage());
         } catch (InterruptedException e) {
@@ -68,7 +69,7 @@ public class MachineService implements MachinePortIn {
             setIpAddress(ipMerge.stream().toList());
             //get infos
             updateListMachineEntities();
-            manageList();
+            //manageList();
             setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             System.out.println("Error scanning ip : "+e.getMessage());

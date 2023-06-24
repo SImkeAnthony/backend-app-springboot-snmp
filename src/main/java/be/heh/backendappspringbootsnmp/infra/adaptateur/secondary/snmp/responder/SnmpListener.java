@@ -5,6 +5,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistance
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.aspectj.weaver.ast.Var;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -56,9 +57,10 @@ public class SnmpListener implements ResponseListener {
     @Override
     public <A extends Address> void onResponse(ResponseEvent<A> event) {
         ((Snmp)event.getSource()).cancel(event.getRequest(), this);
-        //System.out.println("Received message : "+event.getResponse());
+        System.out.println("Received message : "+event.getResponse());
         if(event.getResponse()!=null){
             if(event.getResponse().getErrorStatus() == 0){
+                System.out.println("received message contains pdu : "+event.getResponse());
                 dispatchVariableBindings(event.getResponse().getVariableBindings());
                 if(!getSystemVariableBindings().isEmpty()){
                     processSystemVariableBindings(event.getResponse());
@@ -81,16 +83,16 @@ public class SnmpListener implements ResponseListener {
                     getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
                 }
                 else{
-                    //System.err.println("The response is not supported yet");
-                    addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
+                    System.err.println("The response is not supported yet");
+                    //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
                 }
             }else {
-                //System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
-                addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
+                System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
+                //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
             }
         } else{
-            //System.out.println("host is not reachable or incompatible with SNMPv1");
-            addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
+            System.out.println("host is not reachable or incompatible with SNMPv1");
+            //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
         }
         getLockResponseCounter().increment();
     }
@@ -147,16 +149,66 @@ public class SnmpListener implements ResponseListener {
         });
     }
     private void processMaterialsVariableBindings(PDU pdu){
+        Pair<String,String> mProcessorOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mProcessorTable");
+        Pair<String,String> mDiskOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mDiskTable");
+        Pair<String,String> mVStorageOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mVStorageTable");
 
+        pdu.getVariableBindings().forEach(variableBinding -> {
+            if(variableBinding.getOid().format().equals(mProcessorOID.getValue0()) | variableBinding.getOid().format().equals(mProcessorOID.getValue1())){
+                processProcessor(pdu.getVariableBindings(),mProcessorOID);
+            }else if(variableBinding.getOid().format().equals(mDiskOID.getValue0()) | variableBinding.getOid().format().equals(mDiskOID.getValue1())){
+                processDisk(pdu.getVariableBindings(),mDiskOID);
+            }else if(variableBinding.getOid().format().equals(mVStorageOID.getValue0()) | variableBinding.getOid().format().equals(mVStorageOID.getValue1())){
+                processVStorage(pdu.getVariableBindings(),mVStorageOID);
+            }else{
+                System.err.println("Error can't supported the pdu received : "+pdu);
+            }
+        });
     }
+
+    private void processProcessor(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+        variableBindings.forEach(variableBinding -> {
+            if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
+                setMProcessorNumber(variableBinding.getVariable().toInt());
+            }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
+                addProcessor(getHostnameFromVariableBindings(variableBindings),variableBindings);
+            }else {
+                System.err.println("Error the pdu doesn't contains the variables bindings expected");
+            }
+        });
+    }
+    private void processDisk(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+        variableBindings.forEach(variableBinding -> {
+            if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
+                setMPersiStorageNumber(variableBinding.getVariable().toInt());
+            }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
+                addDisk(getHostnameFromVariableBindings(variableBindings),variableBindings);
+            }else {
+                System.err.println("Error the pdu doesn't contains the variables bindings expected");
+            }
+        });
+    }
+
+    private void processVStorage(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+        variableBindings.forEach(variableBinding -> {
+            if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
+                setMVolStorageNumber(variableBinding.getVariable().toInt());
+            }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
+                addVStorage(getHostnameFromVariableBindings(variableBindings),variableBindings);
+            }else {
+                System.err.println("Error the pdu doesn't contains the variables bindings expected");
+            }
+        });
+    }
+
     private void processServicesVariableBindings(PDU pdu){
 
     }
     private void addInterface(String hostname,List<? extends VariableBinding> parameters){
+        MOManager ifManager = getOidPersistanceAdaptater().getMOManagerByName("interfaces");
+        Interface domainInterface = new Interface("","","");
         parameters.forEach(variableBinding -> {
             String oid = variableBinding.getOid().format();
-            MOManager ifManager = getOidPersistanceAdaptater().getMOManagerByName("interfaces");
-            Interface domainInterface = new Interface("","","");
             if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifDescription",ifManager))){
                 domainInterface.setDescription(variableBinding.getVariable().toString());
             }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifPhysAddress",ifManager))){
@@ -166,17 +218,93 @@ public class SnmpListener implements ResponseListener {
             }else {
                 System.err.println("Error can't supported OID "+oid+" to add interface");
             }
-            if(domainInterface.getDescription().isEmpty() || domainInterface.getMacAddress().isEmpty() || domainInterface.getIpAddress().isEmpty()){}
-            else {
-                getMachineEntities().forEach(machineEntity -> {
-                    if(machineEntity.getHostname().equals(hostname)){
-                        machineEntity.getInterfaces().add(domainInterface);
-                    }
-                });
-            }
         });
+        if(domainInterface.getDescription().isEmpty() || domainInterface.getMacAddress().isEmpty() || domainInterface.getIpAddress().isEmpty()){}
+        else {
+            getMachineEntities().forEach(machineEntity -> {
+                if(machineEntity.getHostname().equals(hostname)){
+                    machineEntity.getInterfaces().add(domainInterface);
+                }
+            });
+        }
     }
 
+    private void addProcessor(String hostname, List<? extends VariableBinding> parameters){
+        MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
+        Processor processor = new Processor("",0,0,0.0);
+        parameters.forEach(variableBinding -> {
+            String oid = variableBinding.getOid().format();
+            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorRef",materialsManager))){
+                processor.setReference(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorCore",materialsManager))){
+                processor.setCore(variableBinding.getVariable().toInt());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorVCore",materialsManager))){
+                processor.setVCore(variableBinding.getVariable().toInt());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorFreq",materialsManager))){
+                processor.setFrequency(Double.valueOf(variableBinding.getVariable().toString()));
+            }else {
+                System.err.println("Error can't supported OID "+oid+" to add processor");
+            }
+        });
+        if(processor.getReference().isEmpty()|processor.getCore()==0|processor.getVCore()==0|processor.getFrequency()==0.0){}
+        else {
+            getMachineEntities().forEach(machineEntity -> {
+                if(machineEntity.getHostname().equals(hostname)){
+                    machineEntity.getProcessors().add(processor);
+                }
+            });
+        }
+    }
+    private void addDisk(String hostname, List<? extends VariableBinding> parameters) {
+        MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
+        PersistentStorage persistentStorage = new PersistentStorage("",0.0,0.0);
+        parameters.forEach(variableBinding -> {
+            String oid = variableBinding.getOid().format();
+            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskRef",materialsManager))){
+                persistentStorage.setReference(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskAvailable",materialsManager))){
+                persistentStorage.setAvailable(Double.valueOf(variableBinding.getVariable().toString()));
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskUsed",materialsManager))){
+                persistentStorage.setUsed(Double.valueOf(variableBinding.getVariable().toString()));
+            }else {
+                System.err.println("Error can't supported OID "+oid+" to add disk");
+            }
+        });
+        if(persistentStorage.getReference().isEmpty()|persistentStorage.getAvailable()==0.0|persistentStorage.getUsed()==0.0){}
+        else {
+            getMachineEntities().forEach(machineEntity -> {
+                if(machineEntity.getHostname().equals(hostname)){
+                    machineEntity.getPersistentStorages().add(persistentStorage);
+                }
+            });
+        }
+    }
+    private void addVStorage(String hostname, List<? extends VariableBinding> parameters) {
+        MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
+        VolatileStorage volatileStorage = new VolatileStorage("",0.0,0.0,0.0);
+        parameters.forEach(variableBinding -> {
+            String oid = variableBinding.getOid().format();
+            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageRef",materialsManager))){
+                volatileStorage.setReference(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageAvailable",materialsManager))){
+                volatileStorage.setAvailable(Double.valueOf(variableBinding.getVariable().toString()));
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageFreq",materialsManager))){
+                volatileStorage.setFrequency(Double.valueOf(variableBinding.getVariable().toString()));
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageLatency",materialsManager))){
+                volatileStorage.setLatency(Double.valueOf(variableBinding.getVariable().toString()));
+            }else {
+                System.err.println("Error can't supported OID "+oid+" to add volatile storage");
+            }
+        });
+        if(volatileStorage.getReference().isEmpty()|volatileStorage.getAvailable()==0.0|volatileStorage.getFrequency()==0.0|volatileStorage.getLatency()==0.0){}
+        else {
+            getMachineEntities().forEach(machineEntity -> {
+                if(machineEntity.getHostname().equals(hostname)){
+                    machineEntity.getVolatileStorages().add(volatileStorage);
+                }
+            });
+        }
+    }
     private String getHostnameFromVariableBindings(List<? extends VariableBinding> variableBindings){
         for(VariableBinding variableBinding : variableBindings){
             if(variableBinding.getOid().equals(getOidPersistanceAdaptater().getOIDHostname())){

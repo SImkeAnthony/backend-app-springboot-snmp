@@ -11,7 +11,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.MibBrowser;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.DeviceScanner;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManager;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManagerAdaptater;
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class MachineConfigurateur {
     private VolatileStoragePersistanceAdaptater volatileStoragePersistanceAdaptater;
     private ServicePersistenceAdaptater servicePersistenceAdaptater;
     private DeviceScanner deviseScanner;
-    private SnmpManager snmpManager;
+    private SnmpManagerAdaptater snmpManagerAdaptater;
     private OIDPersistanceAdaptater oidPersistanceAdaptateur;
     private MibBrowser mibBrowser;
     private SnmpListener snmpListener;
@@ -91,7 +91,7 @@ public class MachineConfigurateur {
         oidPersistanceAdaptateur = new OIDPersistanceAdaptater(mibBrowser);
         snmpListener = new SnmpListener(new ArrayList<>(),oidPersistanceAdaptateur);
 
-        return new SnmpManager(snmpListener,oidPersistanceAdaptateur);
+        return new SnmpManagerAdaptater(snmpListener,oidPersistanceAdaptateur);
     }
 
     @Bean
