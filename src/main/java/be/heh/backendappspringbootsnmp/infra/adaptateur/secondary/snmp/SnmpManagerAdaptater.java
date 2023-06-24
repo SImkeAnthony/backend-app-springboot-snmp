@@ -4,6 +4,7 @@ import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpInterfaceManager;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpMaterialsManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpSystemManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockRequestID;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockResponseCounter;
@@ -36,11 +37,14 @@ public class SnmpManagerAdaptater implements SnmpManagerPortOut {
     private SnmpSystemManager snmpSystemManager = new SnmpSystemManager(snmpListener,oidPersistanceAdaptater);
     @Getter
     private SnmpInterfaceManager snmpInterfaceManager = new SnmpInterfaceManager(snmpListener,oidPersistanceAdaptater);
+    @Getter
+    private SnmpMaterialsManager snmpMaterialsManager = new SnmpMaterialsManager(snmpListener,oidPersistanceAdaptater);
 
     @Override
     public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress){
         snmpSystemManager.completeMachineEntitiesWithSystemVariables(ipAddress);
         snmpInterfaceManager.completeInterfacesForEachMachineEntities(ipAddress);
+        snmpMaterialsManager.completeMaterialsForEachMachineEntities(ipAddress);
         return getSnmpListener().getMachineEntities();
     }
 

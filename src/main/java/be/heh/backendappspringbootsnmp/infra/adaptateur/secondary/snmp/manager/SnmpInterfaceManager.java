@@ -51,7 +51,7 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
         }catch (IOException | ParseException | InterruptedException e) {
-            System.err.println("Error compete interface : "+e.getMessage());
+            System.err.println("Error complete interface : "+e.getMessage());
         }
     }
     private void completeInterfaceForMachineEntity(String ipAddress){

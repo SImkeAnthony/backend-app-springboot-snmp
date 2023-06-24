@@ -133,7 +133,22 @@ public class SnmpListener implements ResponseListener {
         getMachineEntities().add(new MachineEntity("unknown","unknown",false));
     }
     private void processSystemVariableBindings(PDU pdu){
-
+        MOManager sysManager = getOidPersistanceAdaptater().getMOManagerByName("system");
+        MachineEntity machineEntity = new MachineEntity("","",true);
+        pdu.getVariableBindings().forEach(variableBinding -> {
+            String oid = variableBinding.getOid().format();
+            if(oid.equals(getOidPersistanceAdaptater().getOIDByName("sysHostname",sysManager))){
+                machineEntity.setHostname(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDByName("sysOs",sysManager))){
+                machineEntity.setOs(variableBinding.getVariable().toString());
+            }else {
+                System.err.println("Error can't supported OID "+oid+" to add disk");
+            }
+        });
+        if(machineEntity.getHostname().isEmpty()|machineEntity.getOs().isEmpty()){}
+        else {
+            getMachineEntities().add(machineEntity);
+        }
     }
     private void processInterfacesVariableBindings(PDU pdu){
         String ifNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue0();
@@ -144,7 +159,7 @@ public class SnmpListener implements ResponseListener {
             }else if(variableBinding.getOid().format().equals(ifIndexOID)){
                 addInterface(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
             }else{
-                System.err.println("Error can't supported the pdu received : "+pdu);
+                System.err.println("Error can't supported the pdu received : "+pdu+" to process interfaces");
             }
         });
     }
@@ -161,7 +176,7 @@ public class SnmpListener implements ResponseListener {
             }else if(variableBinding.getOid().format().equals(mVStorageOID.getValue0()) | variableBinding.getOid().format().equals(mVStorageOID.getValue1())){
                 processVStorage(pdu.getVariableBindings(),mVStorageOID);
             }else{
-                System.err.println("Error can't supported the pdu received : "+pdu);
+                System.err.println("Error can't supported the pdu received : "+pdu+" to process materials");
             }
         });
     }
@@ -173,7 +188,7 @@ public class SnmpListener implements ResponseListener {
             }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
                 addProcessor(getHostnameFromVariableBindings(variableBindings),variableBindings);
             }else {
-                System.err.println("Error the pdu doesn't contains the variables bindings expected");
+                System.err.println("Error the pdu doesn't contains the variables bindings expected to process processor");
             }
         });
     }
@@ -184,7 +199,7 @@ public class SnmpListener implements ResponseListener {
             }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
                 addDisk(getHostnameFromVariableBindings(variableBindings),variableBindings);
             }else {
-                System.err.println("Error the pdu doesn't contains the variables bindings expected");
+                System.err.println("Error the pdu doesn't contains the variables bindings expected to process disk");
             }
         });
     }
@@ -196,11 +211,10 @@ public class SnmpListener implements ResponseListener {
             }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
                 addVStorage(getHostnameFromVariableBindings(variableBindings),variableBindings);
             }else {
-                System.err.println("Error the pdu doesn't contains the variables bindings expected");
+                System.err.println("Error the pdu doesn't contains the variables bindings expected to process volatile storage");
             }
         });
     }
-
     private void processServicesVariableBindings(PDU pdu){
 
     }
