@@ -5,14 +5,12 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistance
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.aspectj.weaver.ast.Var;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.event.ResponseListener;
 import org.snmp4j.smi.Address;
-import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
 
 import java.util.*;
@@ -44,7 +42,7 @@ public class SnmpListener implements ResponseListener {
     private int mVolStorageNumber;
     @Setter
     @Getter
-    private int mServiceNumber;
+    private int sNumber;
     @Getter
     private List<VariableBinding> systemVariableBindings = new ArrayList<>();
     @Getter
@@ -216,8 +214,19 @@ public class SnmpListener implements ResponseListener {
         });
     }
     private void processServicesVariableBindings(PDU pdu){
-
+        String sNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("sTable").getValue0();
+        String sIndexOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("sTable").getValue1();
+        pdu.getVariableBindings().forEach(variableBinding -> {
+            if(variableBinding.getOid().format().equals(sNumberOID)){
+                setSNumber(variableBinding.getVariable().toInt());
+            }else if(variableBinding.getOid().format().equals(sIndexOID)){
+                addService(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+            }else{
+                System.err.println("Error can't supported the pdu received : "+pdu+" to process interfaces");
+            }
+        });
     }
+
     private void addInterface(String hostname,List<? extends VariableBinding> parameters){
         MOManager ifManager = getOidPersistanceAdaptater().getMOManagerByName("interfaces");
         Interface domainInterface = new Interface("","","");
@@ -242,7 +251,30 @@ public class SnmpListener implements ResponseListener {
             });
         }
     }
-
+    private void addService(String hostname, List<? extends VariableBinding> parameters) {
+        MOManager serviceManager = getOidPersistanceAdaptater().getMOManagerByName("services");
+        Service service =new Service("","","");
+        parameters.forEach(variableBinding -> {
+            String oid = variableBinding.getOid().format();
+            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sName",serviceManager))){
+                service.setName(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sDescription",serviceManager))){
+                service.setDescription(variableBinding.getVariable().toString());
+            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sPort",serviceManager))){
+                service.setPort(variableBinding.getVariable().toString());
+            }else {
+                System.err.println("Error can't supported OID "+oid+" to add interface");
+            }
+        });
+        if(service.getName().isEmpty() || service.getDescription().isEmpty() || service.getPort().isEmpty()){}
+        else {
+            getMachineEntities().forEach(machineEntity -> {
+                if(machineEntity.getHostname().equals(hostname)){
+                    machineEntity.getServices().add(service);
+                }
+            });
+        }
+    }
     private void addProcessor(String hostname, List<? extends VariableBinding> parameters){
         MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
         Processor processor = new Processor("",0,0,0.0);

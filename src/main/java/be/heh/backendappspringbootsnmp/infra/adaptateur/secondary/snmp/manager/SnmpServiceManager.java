@@ -12,16 +12,14 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
-public class SnmpInterfaceManager extends AbstractSnmpManager{
-
-    public SnmpInterfaceManager(SnmpListener snmpListener, OIDPersistanceAdaptater oidPersistanceAdaptater) {
+public class SnmpServiceManager extends AbstractSnmpManager{
+    public SnmpServiceManager(SnmpListener snmpListener, OIDPersistanceAdaptater oidPersistanceAdaptater) {
         super(snmpListener, oidPersistanceAdaptater);
     }
-
-    private int getInterfaceNumber(String ipAddress){
+    private int getServiceNumber(String ipAddress){
         try{
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue0());
+            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("sTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -31,17 +29,17 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
             getSnmp().close();
             return getSnmpListener().getIfNumber();
         }catch (IOException | InterruptedException e){
-            System.err.println("Error to get ifNumber : "+e.getMessage());
+            System.err.println("Error to get sNumber : "+e.getMessage());
             return 0;
         }
     }
-    private void completeInterface(int index,String ipAddress){
+    private void completeService(int index,String ipAddress){
         try{
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
-            getOidPersistanceAdaptater().getColumnOfTable("ifTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+            getOidPersistanceAdaptater().getColumnOfTable("sTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue0()),String.valueOf(index)));
+            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("sTable").getValue0()),String.valueOf(index)));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -49,16 +47,16 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
         }catch (IOException | ParseException | InterruptedException e) {
-            System.err.println("Error complete interface : "+e.getMessage());
+            System.err.println("Error complete service : "+e.getMessage());
         }
     }
-    private void completeInterfaceForMachineEntity(String ipAddress){
-        int ifNumber = getInterfaceNumber(ipAddress);
+    private void completeServicesForMachineEntity(String ipAddress){
+        int ifNumber = getServiceNumber(ipAddress);
         for(int i = 0;i<ifNumber;i++){
-            completeInterface(i,ipAddress);
+            completeService(i,ipAddress);
         }
     }
-    public void completeInterfacesForEachMachineEntities(List<String> ipAddress){
-        ipAddress.forEach(this::completeInterfaceForMachineEntity);
+    public void completeServicesForEachMachineEntities(List<String> ipAddress){
+        ipAddress.forEach(this::completeServicesForMachineEntity);
     }
 }
