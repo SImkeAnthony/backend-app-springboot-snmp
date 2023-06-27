@@ -5,10 +5,8 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
-import org.snmp4j.smi.*;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 
 public class SnmpInterfaceManager extends AbstractSnmpManager{
@@ -21,7 +19,7 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue0());
+            getOIDs().add(getOidPersistanceAdaptater().getOidNumberIndexOfTable("ifTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -38,7 +36,7 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
     }
     private void completeInterface(int index,String ipAddress){
         try{
-            String oidIndex = getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue1();
+            String oidIndex = getOidPersistanceAdaptater().getOidNumberIndexOfTable("ifTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());

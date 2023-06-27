@@ -20,7 +20,7 @@ public class SnmpServiceManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("sTable").getValue0());
+            getOIDs().add(getOidPersistanceAdaptater().getOidNumberIndexOfTable("sTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -41,7 +41,7 @@ public class SnmpServiceManager extends AbstractSnmpManager{
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("sTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("sTable").getValue0()),String.valueOf(index)));
+            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("sTable").getValue0()),String.valueOf(index)));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);

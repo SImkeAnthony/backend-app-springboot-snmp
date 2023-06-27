@@ -148,87 +148,72 @@ public class SnmpListener implements ResponseListener {
     }
     private void processInterfacesVariableBindings(PDU pdu){
         System.out.println("Process interfaces");
-        String ifNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue0();
-        String ifIndexOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue1();
-        pdu.getVariableBindings().forEach(variableBinding -> {
-            if(variableBinding.getOid().format().equals(ifNumberOID)){
-                setIfNumber(Integer.parseInt(variableBinding.getVariable().toString()));
-            }else if(variableBinding.getOid().format().equals(ifIndexOID)){
-                addInterface(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
-            }else{
-                System.err.println("Error can't supported the pdu received : "+pdu+" to process interfaces");
-            }
-        });
+        if(checkIfPduContainsNumber(pdu,"ifTable")){
+            setIfNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),"ifTable"));
+        }else if(checkIfPduContainsIndex(pdu,"ifTable")){
+            addInterface(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        }else {
+            System.err.println("Error can't supported the pdu received : " + pdu + " to process interfaces");
+        }
     }
     private void processMaterialsVariableBindings(PDU pdu){
         System.out.println("Process materials");
-        Pair<String,String> mProcessorOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mProcessorTable");
-        Pair<String,String> mDiskOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mDiskTable");
-        Pair<String,String> mVStorageOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mVStorageTable");
-
         pdu.getVariableBindings().forEach(variableBinding -> {
-            if(variableBinding.getOid().format().equals(mProcessorOID.getValue0()) | variableBinding.getOid().format().equals(mProcessorOID.getValue1())){
-                processProcessor(pdu.getVariableBindings(),mProcessorOID);
-            }else if(variableBinding.getOid().format().equals(mDiskOID.getValue0()) | variableBinding.getOid().format().equals(mDiskOID.getValue1())){
-                processDisk(pdu.getVariableBindings(),mDiskOID);
-            }else if(variableBinding.getOid().format().equals(mVStorageOID.getValue0()) | variableBinding.getOid().format().equals(mVStorageOID.getValue1())){
-                processVStorage(pdu.getVariableBindings(),mVStorageOID);
+            if(checkIfPduContainsIndex(pdu,"mProcessorTable") | checkIfPduContainsIndex(pdu,"mProcessorTable")){
+                processProcessor(pdu);
+            }else if(checkIfPduContainsIndex(pdu,"mDiskTable") | checkIfPduContainsIndex(pdu,"mDiskTable")){
+                processDisk(pdu);
+            }else if(checkIfPduContainsIndex(pdu,"mVStorageTable") | checkIfPduContainsIndex(pdu,"mVStorageTable")){
+                processVStorage(pdu);
             }else{
                 System.err.println("Error can't supported the pdu received : "+pdu+" to process materials");
             }
         });
     }
 
-    private void processProcessor(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+    private void processProcessor(PDU pdu) {
         System.out.println("Process processor");
-        variableBindings.forEach(variableBinding -> {
-            if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
-                setMProcessorNumber(Integer.parseInt(variableBinding.getVariable().toString()));
-            }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
-                addProcessor(getHostnameFromVariableBindings(variableBindings),variableBindings);
-            }else {
-                System.err.println("Error the pdu doesn't contains the variables bindings expected to process processor");
-            }
-        });
+        String tableName = "mProcessorTable";
+        if(checkIfPduContainsNumber(pdu,tableName)){
+            setMProcessorNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),tableName));
+        }else if(checkIfPduContainsIndex(pdu,tableName)){
+            addProcessor(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        }else {
+            System.err.println("Error the pdu doesn't contains the variables bindings expected to process processor");
+        }
     }
-    private void processDisk(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+    private void processDisk(PDU pdu) {
         System.out.println("Process disk");
-        variableBindings.forEach(variableBinding -> {
-            if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
-                setMPersiStorageNumber(Integer.parseInt(variableBinding.getVariable().toString()));
-            }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
-                addDisk(getHostnameFromVariableBindings(variableBindings),variableBindings);
-            }else {
-                System.err.println("Error the pdu doesn't contains the variables bindings expected to process disk");
-            }
-        });
+        String tableName = "mDiskTable";
+        if(checkIfPduContainsIndex(pdu,tableName)){
+            setMPersiStorageNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),tableName));
+        }else if(checkIfPduContainsIndex(pdu,tableName)){
+            addDisk(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        }else {
+            System.err.println("Error the pdu doesn't contains the variables bindings expected to process disk");
+        }
     }
 
-    private void processVStorage(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+    private void processVStorage(PDU pdu) {
         System.out.println("Process vStorage");
-        variableBindings.forEach(variableBinding -> {
-            if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
-                setMVolStorageNumber(Integer.parseInt(variableBinding.getVariable().toString()));
-            }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
-                addVStorage(getHostnameFromVariableBindings(variableBindings),variableBindings);
-            }else {
-                System.err.println("Error the pdu doesn't contains the variables bindings expected to process volatile storage");
-            }
-        });
+        String tableName = "mVStorageTable";
+        if(checkIfPduContainsNumber(pdu,tableName)){
+            setMVolStorageNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),tableName));
+        }else if(checkIfPduContainsIndex(pdu,tableName)){
+            addVStorage(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        }else {
+            System.err.println("Error the pdu doesn't contains the variables bindings expected to process volatile storage");
+        }
     }
     private void processServicesVariableBindings(PDU pdu){
         System.out.println("Process service");
-        String sNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("sTable").getValue0();
-        String sIndexOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("sTable").getValue1();
-        pdu.getVariableBindings().forEach(variableBinding -> {
-            if(variableBinding.getOid().format().equals(sNumberOID)){
-                setSNumber(Integer.parseInt(variableBinding.getVariable().toString()));
-            }else if(variableBinding.getOid().format().equals(sIndexOID)){
-                addService(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
-            }else{
-                System.err.println("Error can't supported the pdu received : "+pdu+" to process services");
-            }
-        });
+        if(checkIfPduContainsNumber(pdu,"sTable")){
+            setSNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),"sTable"));
+        }else if(checkIfPduContainsIndex(pdu,"sTable")){
+            addService(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        }else{
+            System.err.println("Error can't supported the pdu received : "+pdu+" to process services");
+        }
     }
 
     private void addInterface(String hostname,List<? extends VariableBinding> parameters){
@@ -363,6 +348,31 @@ public class SnmpListener implements ResponseListener {
         }
         return "default";
     }
-
+    private int getNumberFromVariableBindings(List<? extends VariableBinding> variableBindings,String tableName){
+        for(VariableBinding variableBinding : variableBindings){
+            if (variableBinding.getOid().format().equals(getOidPersistanceAdaptater().getOidNumberIndexOfTable(tableName).getValue0())){
+                return Integer.parseInt(variableBinding.getVariable().toString());
+            }
+        }
+        return 0;
+    }
+    private boolean checkIfPduContainsNumber(PDU pdu,String tableName){
+        String numberOID = oidPersistanceAdaptater.getOidNumberIndexOfTable(tableName).getValue0();
+        for(VariableBinding variableBinding : pdu.getVariableBindings()){
+            if(variableBinding.getOid().format().equals(numberOID)){
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean checkIfPduContainsIndex(PDU pdu,String tableName){
+        String indexOID = oidPersistanceAdaptater.getOidNumberIndexOfTable(tableName).getValue1();
+        for(VariableBinding variableBinding : pdu.getVariableBindings()){
+            if(variableBinding.getOid().format().equals(indexOID)){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

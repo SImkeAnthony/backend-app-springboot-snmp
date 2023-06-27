@@ -12,7 +12,6 @@ import org.snmp4j.smi.OID;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public class OIDPersistanceAdaptater {
@@ -59,7 +58,7 @@ public class OIDPersistanceAdaptater {
         }
         return "0";
     }
-    public Pair<String,String> getOIDNumberIndexOFTable(String tableName){
+    public Pair<String,String> getOidNumberIndexOfTable(String tableName){
         for(MOManager moManager: getMoManagers()){
             for(MOTable moTable : moManager.getMoTables()){
                 if(moTable.getName().equals(tableName)){

@@ -20,7 +20,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mProcessorTable").getValue0());
+            getOIDs().add(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -42,7 +42,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
             getOidPersistanceAdaptater().getColumnOfTable("mProcessorTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET);
             getPdu().getVariableBindings().forEach(System.out::println);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mProcessorTable").getValue0()),String.valueOf(index)));
+            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue0()),String.valueOf(index)));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -57,7 +57,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mDiskTable").getValue0());
+            getOIDs().add(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -78,7 +78,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mDiskTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mDiskTable").getValue0()),String.valueOf(index)));
+            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue0()),String.valueOf(index)));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -93,7 +93,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mVStorageTable").getValue0());
+            getOIDs().add(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -114,7 +114,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mVStorageTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mVStorageTable").getValue0()),String.valueOf(index)));
+            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue0()),String.valueOf(index)));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
