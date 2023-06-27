@@ -46,7 +46,7 @@ public class MachineService implements MachinePortIn {
                 //scan network
                 setIpAddress(getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254"));
             }
-            getIpAddress().forEach(System.out::println);
+            //getIpAddress().forEach(System.out::println);
             //get infos
             completeListMachineEntities();
             //manageList();

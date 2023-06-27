@@ -17,25 +17,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SnmpManagerAdaptater implements SnmpManagerPortOut {
     @Getter
-    private final SnmpListener snmpListener;
+    private final SnmpSystemManager snmpSystemManager;
     @Getter
-    private final OIDPersistanceAdaptater oidPersistanceAdaptater;
+    private final SnmpInterfaceManager snmpInterfaceManager;
     @Getter
-    private SnmpSystemManager snmpSystemManager = new SnmpSystemManager(snmpListener,oidPersistanceAdaptater);
+    private final SnmpMaterialsManager snmpMaterialsManager;
     @Getter
-    private SnmpInterfaceManager snmpInterfaceManager = new SnmpInterfaceManager(snmpListener,oidPersistanceAdaptater);
-    @Getter
-    private SnmpMaterialsManager snmpMaterialsManager = new SnmpMaterialsManager(snmpListener,oidPersistanceAdaptater);
-    @Getter
-    private SnmpServiceManager snmpServiceManager = new SnmpServiceManager(snmpListener,oidPersistanceAdaptater);
+    private final SnmpServiceManager snmpServiceManager;
 
     @Override
     public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress){
         snmpSystemManager.completeMachineEntitiesWithSystemVariables(ipAddress);
         snmpInterfaceManager.completeInterfacesForEachMachineEntities(ipAddress);
-        snmpMaterialsManager.completeMaterialsForEachMachineEntities(ipAddress);
-        snmpServiceManager.completeServicesForEachMachineEntities(ipAddress);
-        return getSnmpListener().getMachineEntities();
+        //snmpMaterialsManager.completeMaterialsForEachMachineEntities(ipAddress);
+        //snmpServiceManager.completeServicesForEachMachineEntities(ipAddress);
+        return snmpSystemManager.getSnmpListener().getMachineEntities();
     }
 
 }

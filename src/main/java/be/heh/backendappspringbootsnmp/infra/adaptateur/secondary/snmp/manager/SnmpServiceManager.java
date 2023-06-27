@@ -18,6 +18,7 @@ public class SnmpServiceManager extends AbstractSnmpManager{
     }
     private int getServiceNumber(String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("sTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
@@ -35,6 +36,7 @@ public class SnmpServiceManager extends AbstractSnmpManager{
     }
     private void completeService(int index,String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("sTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});

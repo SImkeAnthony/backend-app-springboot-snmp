@@ -5,8 +5,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.VariableBinding;
+import org.snmp4j.smi.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -20,12 +19,14 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
 
     private int getInterfaceNumber(String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
+            System.out.println("send PDU : "+getPdu()+" at "+ipAddress);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
             getSnmp().close();
@@ -37,25 +38,28 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
     }
     private void completeInterface(int index,String ipAddress){
         try{
+            String oidIndex = getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue1();
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("ifTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
-            initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("ifTable").getValue0()),String.valueOf(index)));
+            initPDU(PDU.GET,index,oidIndex);
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
-            initPDU(PDU.GET);
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
-        }catch (IOException | ParseException | InterruptedException e) {
+            getSnmp().close();
+        }catch (IOException | InterruptedException e) {
             System.err.println("Error complete interface : "+e.getMessage());
         }
     }
     private void completeInterfaceForMachineEntity(String ipAddress){
         int ifNumber = getInterfaceNumber(ipAddress);
-        for(int i = 0;i<ifNumber;i++){
-            completeInterface(i,ipAddress);
+        if(ifNumber!=0){
+            for(int i = 1;i<=ifNumber;i++){
+                completeInterface(i,ipAddress);
+            }
         }
     }
     public void completeInterfacesForEachMachineEntities(List<String> ipAddress){

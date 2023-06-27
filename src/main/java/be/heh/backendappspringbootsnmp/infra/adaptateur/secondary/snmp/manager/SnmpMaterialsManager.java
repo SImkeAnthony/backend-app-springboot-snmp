@@ -18,6 +18,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private int getProcessorNumber(String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mProcessorTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
@@ -35,10 +36,12 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeProcessor(int index,String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mProcessorTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET);
+            getPdu().getVariableBindings().forEach(System.out::println);
             getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mProcessorTable").getValue0()),String.valueOf(index)));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
@@ -52,6 +55,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private int getDiskNumber(String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mDiskTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
@@ -69,6 +73,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeDisk(int index,String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mDiskTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
@@ -86,6 +91,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private int getVStorageNumber(String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDNumberIndexOFTable("mVStorageTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
@@ -103,6 +109,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeVStorage(int index,String ipAddress){
         try{
+            initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mVStorageTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});

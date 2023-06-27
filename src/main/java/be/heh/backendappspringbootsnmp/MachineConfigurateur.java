@@ -9,6 +9,10 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.MibBrowser;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpInterfaceManager;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpMaterialsManager;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpServiceManager;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpSystemManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.DeviceScanner;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManagerAdaptater;
@@ -27,6 +31,9 @@ import java.util.Map;
 @Configuration
 @EnableJpaRepositories
 public class MachineConfigurateur {
+    // -------------------- //
+    //      Repository      //
+    // -------------------- //
     @Autowired
     private MachineRepository machineRepository;
     @Autowired
@@ -39,13 +46,18 @@ public class MachineConfigurateur {
     private VolatileStorageRepository volatileStorageRepository;
     @Autowired
     private ServiceRepository serviceRepository;
-
+    // ---------------- //
+    //      Mapper      //
+    // ---------------- //
     private MachineMapper machineMapper=new MachineMapper();
     private InterfaceMapper interfaceMapper = new InterfaceMapper();
     private ProcessorMapper processorMapper = new ProcessorMapper();
     private PersistentStorageMapper persistentStorageMapper = new PersistentStorageMapper();
     private VolatileStorageMapper volatileStorageMapper = new VolatileStorageMapper();
     private ServiceMapper serviceMapper = new ServiceMapper();
+    // ----------------- //
+    //      Adaptater    //
+    // ----------------- //
     private MachinePersistanceAdaptater machinePersistanceAdaptater;
     private InterfacePersistanceAdaptater interfacePersistanceAdaptater;
     private ProcessorPersistanceAdaptater processorPersistanceAdaptater;
@@ -53,8 +65,17 @@ public class MachineConfigurateur {
     private VolatileStoragePersistanceAdaptater volatileStoragePersistanceAdaptater;
     private ServicePersistenceAdaptater servicePersistenceAdaptater;
     private DeviceScanner deviseScanner;
-    private SnmpManagerAdaptater snmpManagerAdaptater;
-    private OIDPersistanceAdaptater oidPersistanceAdaptateur;
+    private OIDPersistanceAdaptater oidPersistanceAdaptater;
+    // ------------------ //
+    //      Manager       //
+    // ------------------ //
+    private SnmpSystemManager snmpSystemManager;
+    private SnmpInterfaceManager snmpInterfaceManager;
+    private SnmpMaterialsManager snmpMaterialsManager;
+    private SnmpServiceManager snmpServiceManager;
+    // -------------------- //
+    //      Component       //
+    // -------------------- //
     private MibBrowser mibBrowser;
     private SnmpListener snmpListener;
     private Map<String, MOAccess> access = new HashMap<>();
@@ -88,10 +109,15 @@ public class MachineConfigurateur {
     public SnmpManagerPortOut getSnmpManagerPortOut(){
         completeAccess();
         mibBrowser = new MibBrowser(access);
-        oidPersistanceAdaptateur = new OIDPersistanceAdaptater(mibBrowser);
-        snmpListener = new SnmpListener(new ArrayList<>(),oidPersistanceAdaptateur);
-
-        return new SnmpManagerAdaptater(snmpListener,oidPersistanceAdaptateur);
+        oidPersistanceAdaptater = new OIDPersistanceAdaptater(mibBrowser);
+        oidPersistanceAdaptater.setMibFile("personal-mib.json");
+        oidPersistanceAdaptater.initMOManagers();
+        snmpListener = new SnmpListener(oidPersistanceAdaptater);
+        snmpSystemManager = new SnmpSystemManager(snmpListener,oidPersistanceAdaptater);
+        snmpInterfaceManager = new SnmpInterfaceManager(snmpListener,oidPersistanceAdaptater);
+        snmpMaterialsManager = new SnmpMaterialsManager(snmpListener,oidPersistanceAdaptater);
+        snmpServiceManager = new SnmpServiceManager(snmpListener,oidPersistanceAdaptater);
+        return new SnmpManagerAdaptater(snmpSystemManager,snmpInterfaceManager,snmpMaterialsManager,snmpServiceManager);
     }
 
     @Bean

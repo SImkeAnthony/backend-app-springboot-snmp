@@ -34,10 +34,11 @@ public class MibBrowser {
 
     public void reinitialize(String newMibFile){
         try{
+            setMibFileName(newMibFile);
             InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(getMibFileName());
             String jsonContent = new String(inputStream.readAllBytes(),StandardCharsets.ISO_8859_1);
             setJsonObject(new JSONObject(jsonContent));
-        }catch (IOException e){
+        }catch (Exception e){
             System.err.println("Error mapping io : "+e.getMessage());
         }
     }
@@ -89,7 +90,7 @@ public class MibBrowser {
     public List<MOTable> getMOTableBySubTree(OID oidIdentity){
         List<MOTable> moTables = new ArrayList<>();
         MOTableSubIndex[] moTableSubIndexes = new MOTableSubIndex[]{
-                new MOTableSubIndex(SMIConstants.SYNTAX_INTEGER)
+            new MOTableSubIndex(SMIConstants.SYNTAX_INTEGER)
         };
         Iterator<String> keys = getJsonObject().keys();
         while (keys.hasNext()){
@@ -100,6 +101,7 @@ public class MibBrowser {
                     moTable.setColumns(getColumnBySubTree(getOIDEntryByOIDTable(new OID(mo.get("oid").toString()))));
                     moTable.setOidNumber(getOIDNumberOfTable(new OID(mo.get("oid").toString())));
                     moTable.setOidIndex(getOIDIndexOfTable(getOIDEntryByOIDTable(new OID(mo.get("oid").toString()))));
+                    moTables.add(moTable);
                 }
             }
         }
@@ -128,7 +130,7 @@ public class MibBrowser {
         while (keys.hasNext()){
             JSONObject mo = getJsonObject().getJSONObject(keys.next());
             if(mo.has("class")){
-                if(mo.get("class").equals("objecttype") && mo.get("nodetype").equals("table") && mo.get("oid").toString().contains(oidEntryTable.toString()+".1")){
+                if(mo.get("class").equals("objecttype") && mo.get("nodetype").equals("column") && mo.get("oid").toString().contains(oidEntryTable.toString()+".1")){
                     return mo.get("oid").toString();
                 }
             }
@@ -156,7 +158,7 @@ public class MibBrowser {
             JSONObject mo = getJsonObject().getJSONObject(keys.next());
             if(mo.has("class")){
                 if(mo.get("class").equals("objecttype") && mo.get("nodetype").equals("column") && mo.get("oid").toString().contains(oidIdentity.toString())){
-                    System.out.println("found a column for "+oidIdentity);
+                if(mo.get("class").equals("objecttype") && mo.get("nodetype").equals("column") && mo.get("oid").toString().contains(oidIdentity.toString()))
                     moColumns.add(new MOVariable(
                             mo.get("name").toString(),
                             mo.get("oid").toString(),

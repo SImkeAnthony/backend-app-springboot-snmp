@@ -18,9 +18,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SnmpListener implements ResponseListener {
     @Getter
-    private final List<MachineEntity> machineEntities;
-    @Getter
     private final OIDPersistanceAdaptater oidPersistanceAdaptater;
+    @Getter
+    private List<MachineEntity> machineEntities = new ArrayList<>();
     @Getter
     private Map<Integer, Pair<String, Boolean>> requestController = new HashMap<>();
     @Getter
@@ -55,12 +55,11 @@ public class SnmpListener implements ResponseListener {
     @Override
     public <A extends Address> void onResponse(ResponseEvent<A> event) {
         ((Snmp)event.getSource()).cancel(event.getRequest(), this);
-        System.out.println("Received message : "+event.getResponse());
         if(event.getResponse()!=null){
+            System.out.println("Received message : "+event.getResponse());
             if(event.getResponse().getErrorStatus() == 0){
-                System.out.println("received message contains pdu : "+event.getResponse());
                 dispatchVariableBindings(event.getResponse().getVariableBindings());
-                if(!getSystemVariableBindings().isEmpty()){
+                if(!getSystemVariableBindings().isEmpty() && getSystemVariableBindings().size()!=1){
                     processSystemVariableBindings(event.getResponse());
                     Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
                     getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
@@ -75,21 +74,17 @@ public class SnmpListener implements ResponseListener {
                     Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
                     getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
                 }
-                if(getServicesVariableBindings().isEmpty()){
+                if(!getServicesVariableBindings().isEmpty()){
                     processServicesVariableBindings(event.getResponse());
                     Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
                     getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
-                }
-                else{
-                    System.err.println("The response is not supported yet");
-                    //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
                 }
             }else {
                 System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
                 //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
             }
         } else{
-            System.out.println("host is not reachable or incompatible with SNMPv1");
+            //System.out.println("host is not reachable or incompatible with SNMPv1");
             //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
         }
         getLockResponseCounter().increment();
@@ -101,11 +96,13 @@ public class SnmpListener implements ResponseListener {
         variableBindings.forEach(variableBinding -> {
             getOidPersistanceAdaptater().getMoManagers().forEach(moManager -> {
                 if(variableBinding.getOid().format().contains(moManager.getOidRoot())){
+                    //System.out.println("find a manager to dispatch => "+variableBinding.getOid().format()+" : "+moManager.getOidRoot());
+                    //System.out.println("case : "+getManagerController().get(moManager.getName()));
                     switch (getManagerController().get(moManager.getName())){
-                        case 1:{getSystemVariableBindings().add(variableBinding);}
-                        case 2:{getInterfacesVariableBindings().add(variableBinding);}
-                        case 3:{getMaterialsVariableBindings().add(variableBinding);}
-                        case 4:{getServicesVariableBindings().add(variableBinding);}
+                        case 1:{getSystemVariableBindings().add(variableBinding);break;}
+                        case 2:{getInterfacesVariableBindings().add(variableBinding);break;}
+                        case 3:{getMaterialsVariableBindings().add(variableBinding);break;}
+                        case 4:{getServicesVariableBindings().add(variableBinding);break;}
                         default:{System.err.println("the variables "+variableBinding.getOid()+" can't be dispatched in list because is not be supported");}
                     }
                 }
@@ -131,6 +128,7 @@ public class SnmpListener implements ResponseListener {
         getMachineEntities().add(new MachineEntity("unknown","unknown",false));
     }
     private void processSystemVariableBindings(PDU pdu){
+        System.out.println("Process system");
         MOManager sysManager = getOidPersistanceAdaptater().getMOManagerByName("system");
         MachineEntity machineEntity = new MachineEntity("","",true);
         pdu.getVariableBindings().forEach(variableBinding -> {
@@ -140,7 +138,7 @@ public class SnmpListener implements ResponseListener {
             }else if(oid.equals(getOidPersistanceAdaptater().getOIDByName("sysOs",sysManager))){
                 machineEntity.setOs(variableBinding.getVariable().toString());
             }else {
-                System.err.println("Error can't supported OID "+oid+" to add disk");
+                System.err.println("Error can't supported OID "+oid+" to process system");
             }
         });
         if(machineEntity.getHostname().isEmpty()|machineEntity.getOs().isEmpty()){}
@@ -149,11 +147,12 @@ public class SnmpListener implements ResponseListener {
         }
     }
     private void processInterfacesVariableBindings(PDU pdu){
+        System.out.println("Process interfaces");
         String ifNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue0();
         String ifIndexOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("ifTable").getValue1();
         pdu.getVariableBindings().forEach(variableBinding -> {
             if(variableBinding.getOid().format().equals(ifNumberOID)){
-                setIfNumber(variableBinding.getVariable().toInt());
+                setIfNumber(Integer.parseInt(variableBinding.getVariable().toString()));
             }else if(variableBinding.getOid().format().equals(ifIndexOID)){
                 addInterface(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
             }else{
@@ -162,6 +161,7 @@ public class SnmpListener implements ResponseListener {
         });
     }
     private void processMaterialsVariableBindings(PDU pdu){
+        System.out.println("Process materials");
         Pair<String,String> mProcessorOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mProcessorTable");
         Pair<String,String> mDiskOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mDiskTable");
         Pair<String,String> mVStorageOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("mVStorageTable");
@@ -180,9 +180,10 @@ public class SnmpListener implements ResponseListener {
     }
 
     private void processProcessor(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+        System.out.println("Process processor");
         variableBindings.forEach(variableBinding -> {
             if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
-                setMProcessorNumber(variableBinding.getVariable().toInt());
+                setMProcessorNumber(Integer.parseInt(variableBinding.getVariable().toString()));
             }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
                 addProcessor(getHostnameFromVariableBindings(variableBindings),variableBindings);
             }else {
@@ -191,9 +192,10 @@ public class SnmpListener implements ResponseListener {
         });
     }
     private void processDisk(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+        System.out.println("Process disk");
         variableBindings.forEach(variableBinding -> {
             if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
-                setMPersiStorageNumber(variableBinding.getVariable().toInt());
+                setMPersiStorageNumber(Integer.parseInt(variableBinding.getVariable().toString()));
             }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
                 addDisk(getHostnameFromVariableBindings(variableBindings),variableBindings);
             }else {
@@ -203,9 +205,10 @@ public class SnmpListener implements ResponseListener {
     }
 
     private void processVStorage(List<? extends  VariableBinding> variableBindings,Pair<String,String> numberIndex) {
+        System.out.println("Process vStorage");
         variableBindings.forEach(variableBinding -> {
             if(variableBinding.getOid().format().equals(numberIndex.getValue0())){
-                setMVolStorageNumber(variableBinding.getVariable().toInt());
+                setMVolStorageNumber(Integer.parseInt(variableBinding.getVariable().toString()));
             }else if(variableBinding.getOid().format().equals(numberIndex.getValue1())){
                 addVStorage(getHostnameFromVariableBindings(variableBindings),variableBindings);
             }else {
@@ -214,15 +217,16 @@ public class SnmpListener implements ResponseListener {
         });
     }
     private void processServicesVariableBindings(PDU pdu){
+        System.out.println("Process service");
         String sNumberOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("sTable").getValue0();
         String sIndexOID = oidPersistanceAdaptater.getOIDNumberIndexOFTable("sTable").getValue1();
         pdu.getVariableBindings().forEach(variableBinding -> {
             if(variableBinding.getOid().format().equals(sNumberOID)){
-                setSNumber(variableBinding.getVariable().toInt());
+                setSNumber(Integer.parseInt(variableBinding.getVariable().toString()));
             }else if(variableBinding.getOid().format().equals(sIndexOID)){
                 addService(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
             }else{
-                System.err.println("Error can't supported the pdu received : "+pdu+" to process interfaces");
+                System.err.println("Error can't supported the pdu received : "+pdu+" to process services");
             }
         });
     }
@@ -263,7 +267,7 @@ public class SnmpListener implements ResponseListener {
             }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sPort",serviceManager))){
                 service.setPort(variableBinding.getVariable().toString());
             }else {
-                System.err.println("Error can't supported OID "+oid+" to add interface");
+                System.err.println("Error can't supported OID "+oid+" to add service");
             }
         });
         if(service.getName().isEmpty() || service.getDescription().isEmpty() || service.getPort().isEmpty()){}

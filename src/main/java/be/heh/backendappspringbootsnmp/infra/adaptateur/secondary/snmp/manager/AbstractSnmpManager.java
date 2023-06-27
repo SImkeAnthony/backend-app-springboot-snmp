@@ -122,6 +122,27 @@ public class AbstractSnmpManager {
             System.err.println("Error pdu : "+getPdu().getErrorStatus()+" => "+getPdu().getErrorStatusText());
         }
     }
+    protected void initPDU(int pduType,int index,String oidIndex){
+        setPdu(new PDU());
+        for(String oid:getOIDs()){
+            VariableBinding variableBinding = new VariableBinding();
+            variableBinding.setOid(new OID(oid));
+            if(variableBinding.getOid().format().equals(oidIndex)){
+                variableBinding.setVariable(new Integer32(index));
+            }
+            getPdu().add(variableBinding);
+        }
+        getPdu().setType(pduType);
+        getPdu().setRequestID(new Integer32(getLockRequestID().getRequestID()));
+        if(getLockRequestID().getRequestID()>10000){
+            getLockRequestID().setRequestID(0);
+            getSnmpListener().getRequestController().clear();
+        }
+        getLockRequestID().setRequestID(getLockRequestID().getRequestID()+1);
+        if(getPdu().getErrorStatus()!=0){
+            System.err.println("Error pdu : "+getPdu().getErrorStatus()+" => "+getPdu().getErrorStatusText());
+        }
+    }
     protected void initScopedPDU(int scopedPduType){
         setScopedPDU(new ScopedPDU());
         for(String oid:getOIDs()){

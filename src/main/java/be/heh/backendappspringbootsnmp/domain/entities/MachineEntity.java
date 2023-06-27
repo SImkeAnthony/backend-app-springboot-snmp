@@ -59,6 +59,6 @@ public class MachineEntity {
 
     @Override
     public String toString(){
-        return String.join(" : ",Long.toString(id),hostname,os,snmp.toString());
+        return String.join(" : ",hostname,os,snmp.toString());
     }
 }

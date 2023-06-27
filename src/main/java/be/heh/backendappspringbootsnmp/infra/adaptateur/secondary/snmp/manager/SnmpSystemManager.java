@@ -42,7 +42,7 @@ public class SnmpSystemManager extends AbstractSnmpManager{
             }
             getLockResponseCounter().waitResponse();
             getSnmp().close();
-            getSnmpListener().getMachineEntities().forEach(System.out::println);
+            //getSnmpListener().getMachineEntities().forEach(System.out::println);
         }catch (IOException | InterruptedException e){
             System.err.println("Error to compete system variable : "+e.getMessage());
         }

@@ -1,10 +1,13 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
+import be.heh.backendappspringbootsnmp.domain.entities.Interface;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
+import be.heh.backendappspringbootsnmp.domain.entities.PersistentStorage;
+import be.heh.backendappspringbootsnmp.domain.entities.Service;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity.MachineJpaEntity;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -42,10 +45,9 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
     }
     @Override
     public void registerMachineEntities(List<MachineEntity> machineEntities) {
-        setMachineJpaEntities(machineMapper.mapMachineDomainToJpa(machineEntities));
-        for(MachineJpaEntity machineJpaEntity : getMachineJpaEntities()){
+        for(MachineEntity machineEntity : machineEntities){
             try {
-                machineRepository.save(machineJpaEntity);
+                registerMachineEntity(machineEntity);
             }catch (Exception e){
                 System.err.println("Error register entities : "+e.getMessage());
             }
@@ -60,7 +62,15 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
     @Override
     public void registerMachineEntity(MachineEntity machineEntity) {
         machineRepository.save(machineMapper.mapMachineDomainToJpa(machineEntity));
-
+        Long id = machineEntity.getId();
+        if(machineEntity.getId()==null){
+            id = machineRepository.findByHostName(machineEntity.getHostname()).getId();
+        }
+        interfacePersistanceAdaptater.registerInterfaces(machineEntity.getInterfaces(),id);
+        processorPersistanceAdaptater.registerProcessors(machineEntity.getProcessors(),id);
+        persistentStoragePersistanceAdaptater.registerPersistentStorages(machineEntity.getPersistentStorages(),id);
+        volatileStoragePersistanceAdaptater.registerVolatileStorages(machineEntity.getVolatileStorages(),id);
+        servicePersistenceAdaptater.registerServices(machineEntity.getServices(),id);
     }
 
 }

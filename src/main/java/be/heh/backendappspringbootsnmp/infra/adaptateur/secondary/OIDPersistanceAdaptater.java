@@ -25,10 +25,12 @@ public class OIDPersistanceAdaptater {
     private List<MOManager> moManagers = new ArrayList<>();
 
     public void initMOManagers(){
+        getMibBrowser().reinitialize(getMibFile());
         getMibBrowser().getNodeIdentity().forEach(nodeIdentity->{
             MOManager moManager = new MOManager(nodeIdentity.getValue0(),nodeIdentity.getValue1());
             moManager.setMoVariables(getMibBrowser().getMOVariablesBySubTree(new OID(moManager.getOidRoot())));
             moManager.setMoTables(getMibBrowser().getMOTableBySubTree(new OID(moManager.getOidRoot())));
+            getMoManagers().add(moManager);
         });
     }
 
