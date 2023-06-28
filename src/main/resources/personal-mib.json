@@ -85,7 +85,7 @@
         "description":"It represents a index of an entry (interface) of the table. This number is in range between 1 to ifNumber"
     },
     "ifDescription":{
-        "name":"ifPhysAddress",
+        "name":"ifDescription",
         "oid":"1.3.6.1.2.1.2.2.1.2",
         "nodetype":"column",
         "class":"objecttype",

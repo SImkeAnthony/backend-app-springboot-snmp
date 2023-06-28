@@ -36,6 +36,6 @@ public class VolatileStorage {
 
     @Override
     public String toString(){
-        return String.join(" : ",id.toString(),reference,available.toString(),frequency.toString(), latency.toString());
+        return String.join(" : ",reference,available.toString(),frequency.toString(), latency.toString());
     }
 }

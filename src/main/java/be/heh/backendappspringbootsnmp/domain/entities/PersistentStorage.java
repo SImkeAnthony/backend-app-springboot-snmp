@@ -30,6 +30,6 @@ public class PersistentStorage {
     }
     @Override
     public String toString(){
-        return String.join(" : ",id.toString(),reference, available.toString(), used.toString());
+        return String.join(" : ",reference, available.toString(), used.toString());
     }
 }

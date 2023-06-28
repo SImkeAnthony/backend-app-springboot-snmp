@@ -35,6 +35,6 @@ public class Processor {
     }
     @Override
     public String toString(){
-        return String.join(" : ",Long.toString(id),reference,core.toString(),vCore.toString(), frequency.toString());
+        return String.join(" : ",reference,core.toString(),vCore.toString(), frequency.toString());
     }
 }

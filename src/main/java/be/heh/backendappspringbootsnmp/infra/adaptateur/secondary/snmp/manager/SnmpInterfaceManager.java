@@ -62,5 +62,9 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
     }
     public void completeInterfacesForEachMachineEntities(List<String> ipAddress){
         ipAddress.forEach(this::completeInterfaceForMachineEntity);
+        getSnmpListener().getMachineEntities().forEach(machineEntity -> {
+            System.out.println(machineEntity);
+            System.out.println(machineEntity.getInterfaces());
+        });
     }
 }

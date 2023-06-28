@@ -31,6 +31,6 @@ public class Interface {
 
     @Override
     public String toString(){
-        return String.join(" : ",Long.toString(id),description,ipAddress,macAddress);
+        return String.join(" : ",description,ipAddress,macAddress);
     }
 }

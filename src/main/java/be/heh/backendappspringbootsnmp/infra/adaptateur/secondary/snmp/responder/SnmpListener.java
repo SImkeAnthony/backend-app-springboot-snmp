@@ -5,6 +5,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistance
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.aspectj.weaver.ast.Var;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -60,24 +61,18 @@ public class SnmpListener implements ResponseListener {
             if(event.getResponse().getErrorStatus() == 0){
                 dispatchVariableBindings(event.getResponse().getVariableBindings());
                 if(!getSystemVariableBindings().isEmpty() && getSystemVariableBindings().size()!=1){
-                    processSystemVariableBindings(event.getResponse());
+                    processSystemVariableBindings();
                     Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
                     getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
                 }
                 if(!getInterfacesVariableBindings().isEmpty()){
-                    processInterfacesVariableBindings(event.getResponse());
-                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
-                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                    processInterfacesVariableBindings(getHostnameFromVariableBindings(event.getResponse().getVariableBindings()));
                 }
                 if(!getMaterialsVariableBindings().isEmpty()){
-                    processMaterialsVariableBindings(event.getResponse());
-                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
-                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                    processMaterialsVariableBindings(getHostnameFromVariableBindings(event.getResponse().getVariableBindings()));
                 }
                 if(!getServicesVariableBindings().isEmpty()){
-                    processServicesVariableBindings(event.getResponse());
-                    Pair<String, Boolean> currentPair = getRequestController().get(event.getResponse().getRequestID().getValue());
-                    getRequestController().put(event.getResponse().getRequestID().getValue(),currentPair.setAt1(true));
+                    processServicesVariableBindings(getHostnameFromVariableBindings(event.getResponse().getVariableBindings()));
                 }
             }else {
                 System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
@@ -127,11 +122,11 @@ public class SnmpListener implements ResponseListener {
     private void addUnknownMachineEntity(String ipAddr){
         getMachineEntities().add(new MachineEntity("unknown","unknown",false));
     }
-    private void processSystemVariableBindings(PDU pdu){
+    private void processSystemVariableBindings(){
         System.out.println("Process system");
         MOManager sysManager = getOidPersistanceAdaptater().getMOManagerByName("system");
         MachineEntity machineEntity = new MachineEntity("","",true);
-        pdu.getVariableBindings().forEach(variableBinding -> {
+        getSystemVariableBindings().forEach(variableBinding -> {
             String oid = variableBinding.getOid().format();
             if(oid.equals(getOidPersistanceAdaptater().getOIDByName("sysHostname",sysManager))){
                 machineEntity.setHostname(variableBinding.getVariable().toString());
@@ -146,78 +141,76 @@ public class SnmpListener implements ResponseListener {
             getMachineEntities().add(machineEntity);
         }
     }
-    private void processInterfacesVariableBindings(PDU pdu){
+    private void processInterfacesVariableBindings(String hostname){
         System.out.println("Process interfaces");
-        if(checkIfPduContainsNumber(pdu,"ifTable")){
-            setIfNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),"ifTable"));
-        }else if(checkIfPduContainsIndex(pdu,"ifTable")){
-            addInterface(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        if(checkIfPduContainsNumber(getInterfacesVariableBindings(),"ifTable")){
+            setIfNumber(getNumberFromVariableBindings(getInterfacesVariableBindings(),"ifTable"));
+        }else if(checkIfPduContainsIndex(getInterfacesVariableBindings(),"ifTable")){
+            addInterface(hostname,getInterfacesVariableBindings());
         }else {
-            System.err.println("Error can't supported the pdu received : " + pdu + " to process interfaces");
+            System.err.println("Error can't supported the pdu received to process interfaces");
         }
     }
-    private void processMaterialsVariableBindings(PDU pdu){
+    private void processMaterialsVariableBindings(String hostname){
         System.out.println("Process materials");
-        pdu.getVariableBindings().forEach(variableBinding -> {
-            if(checkIfPduContainsIndex(pdu,"mProcessorTable") | checkIfPduContainsIndex(pdu,"mProcessorTable")){
-                processProcessor(pdu);
-            }else if(checkIfPduContainsIndex(pdu,"mDiskTable") | checkIfPduContainsIndex(pdu,"mDiskTable")){
-                processDisk(pdu);
-            }else if(checkIfPduContainsIndex(pdu,"mVStorageTable") | checkIfPduContainsIndex(pdu,"mVStorageTable")){
-                processVStorage(pdu);
-            }else{
-                System.err.println("Error can't supported the pdu received : "+pdu+" to process materials");
-            }
-        });
+        if(checkIfPduContainsIndex(getMaterialsVariableBindings(),"mProcessorTable") | checkIfPduContainsIndex(getMaterialsVariableBindings(),"mProcessorTable")){
+            processProcessor(hostname);
+        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),"mDiskTable") | checkIfPduContainsIndex(getMaterialsVariableBindings(),"mDiskTable")){
+            processDisk(hostname);
+        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),"mVStorageTable") | checkIfPduContainsIndex(getMaterialsVariableBindings(),"mVStorageTable")){
+            processVStorage(hostname);
+        }else{
+            System.err.println("Error can't supported the pdu received : to process materials");
+        }
     }
-
-    private void processProcessor(PDU pdu) {
+    private void processProcessor(String hostname) {
         System.out.println("Process processor");
         String tableName = "mProcessorTable";
-        if(checkIfPduContainsNumber(pdu,tableName)){
-            setMProcessorNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),tableName));
-        }else if(checkIfPduContainsIndex(pdu,tableName)){
-            addProcessor(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        if(checkIfPduContainsNumber(getMaterialsVariableBindings(),tableName)){
+            setMProcessorNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
+        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),tableName)){
+            addProcessor(hostname,getMaterialsVariableBindings());
         }else {
             System.err.println("Error the pdu doesn't contains the variables bindings expected to process processor");
         }
     }
-    private void processDisk(PDU pdu) {
+    private void processDisk(String hostname) {
         System.out.println("Process disk");
         String tableName = "mDiskTable";
-        if(checkIfPduContainsIndex(pdu,tableName)){
-            setMPersiStorageNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),tableName));
-        }else if(checkIfPduContainsIndex(pdu,tableName)){
-            addDisk(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        if(checkIfPduContainsIndex(getMaterialsVariableBindings(),tableName)){
+            setMPersiStorageNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
+        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),tableName)){
+            addDisk(hostname,getMaterialsVariableBindings());
         }else {
             System.err.println("Error the pdu doesn't contains the variables bindings expected to process disk");
         }
     }
 
-    private void processVStorage(PDU pdu) {
+    private void processVStorage(String hostname) {
         System.out.println("Process vStorage");
         String tableName = "mVStorageTable";
-        if(checkIfPduContainsNumber(pdu,tableName)){
-            setMVolStorageNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),tableName));
-        }else if(checkIfPduContainsIndex(pdu,tableName)){
-            addVStorage(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        if(checkIfPduContainsNumber(getMaterialsVariableBindings(),tableName)){
+            setMVolStorageNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
+        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),tableName)){
+            addVStorage(hostname,getMaterialsVariableBindings());
         }else {
             System.err.println("Error the pdu doesn't contains the variables bindings expected to process volatile storage");
         }
     }
-    private void processServicesVariableBindings(PDU pdu){
+    private void processServicesVariableBindings(String hostname){
         System.out.println("Process service");
-        if(checkIfPduContainsNumber(pdu,"sTable")){
-            setSNumber(getNumberFromVariableBindings(pdu.getVariableBindings(),"sTable"));
-        }else if(checkIfPduContainsIndex(pdu,"sTable")){
-            addService(getHostnameFromVariableBindings(pdu.getVariableBindings()),pdu.getVariableBindings());
+        if(checkIfPduContainsNumber(getServicesVariableBindings(),"sTable")){
+            setSNumber(getNumberFromVariableBindings(getServicesVariableBindings(),"sTable"));
+        }else if(checkIfPduContainsIndex(getServicesVariableBindings(),"sTable")){
+            addService(hostname,getServicesVariableBindings());
         }else{
-            System.err.println("Error can't supported the pdu received : "+pdu+" to process services");
+            System.err.println("Error can't supported the pdu received : to process services");
         }
     }
 
     private void addInterface(String hostname,List<? extends VariableBinding> parameters){
         MOManager ifManager = getOidPersistanceAdaptater().getMOManagerByName("interfaces");
+        System.out.println("add if host : "+hostname);
         Interface domainInterface = new Interface("","","");
         parameters.forEach(variableBinding -> {
             String oid = variableBinding.getOid().format();
@@ -227,11 +220,15 @@ public class SnmpListener implements ResponseListener {
                 domainInterface.setMacAddress(variableBinding.getVariable().toString());
             }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifAddress",ifManager))){
                 domainInterface.setIpAddress(variableBinding.getVariable().toString());
-            }else {
+            } else if (oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifIndex",ifManager))) {
+                //don't manage id for entity is not registered yet
+            } else {
                 System.err.println("Error can't supported OID "+oid+" to add interface");
             }
         });
-        if(domainInterface.getDescription().isEmpty() || domainInterface.getMacAddress().isEmpty() || domainInterface.getIpAddress().isEmpty()){}
+        if(domainInterface.getDescription().isEmpty() || domainInterface.getMacAddress().isEmpty() || domainInterface.getIpAddress().isEmpty()){
+            System.err.println("Error has occurred during adding new interface");
+        }
         else {
             getMachineEntities().forEach(machineEntity -> {
                 if(machineEntity.getHostname().equals(hostname)){
@@ -342,32 +339,36 @@ public class SnmpListener implements ResponseListener {
     }
     private String getHostnameFromVariableBindings(List<? extends VariableBinding> variableBindings){
         for(VariableBinding variableBinding : variableBindings){
-            if(variableBinding.getOid().equals(getOidPersistanceAdaptater().getOIDHostname())){
+            if(variableBinding.getOid().format().equals(getOidPersistanceAdaptater().getOIDHostname())){
                 return variableBinding.getVariable().toString();
             }
         }
         return "default";
     }
-    private int getNumberFromVariableBindings(List<? extends VariableBinding> variableBindings,String tableName){
+    private int getNumberFromVariableBindings(List<VariableBinding> variableBindings,String tableName){
         for(VariableBinding variableBinding : variableBindings){
             if (variableBinding.getOid().format().equals(getOidPersistanceAdaptater().getOidNumberIndexOfTable(tableName).getValue0())){
-                return Integer.parseInt(variableBinding.getVariable().toString());
+                if(!variableBinding.getVariable().toString().equals("Null")){
+                    return Integer.parseInt(variableBinding.getVariable().toString());
+                }else {
+                    return 0;
+                }
             }
         }
         return 0;
     }
-    private boolean checkIfPduContainsNumber(PDU pdu,String tableName){
+    private boolean checkIfPduContainsNumber(List<VariableBinding> variableBindings,String tableName){
         String numberOID = oidPersistanceAdaptater.getOidNumberIndexOfTable(tableName).getValue0();
-        for(VariableBinding variableBinding : pdu.getVariableBindings()){
+        for(VariableBinding variableBinding : variableBindings){
             if(variableBinding.getOid().format().equals(numberOID)){
                 return true;
             }
         }
         return false;
     }
-    private boolean checkIfPduContainsIndex(PDU pdu,String tableName){
+    private boolean checkIfPduContainsIndex(List<VariableBinding> variableBindings, String tableName){
         String indexOID = oidPersistanceAdaptater.getOidNumberIndexOfTable(tableName).getValue1();
-        for(VariableBinding variableBinding : pdu.getVariableBindings()){
+        for(VariableBinding variableBinding : variableBindings){
             if(variableBinding.getOid().format().equals(indexOID)){
                 return true;
             }

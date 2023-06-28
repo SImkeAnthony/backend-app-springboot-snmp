@@ -91,7 +91,7 @@ public class OIDPersistanceAdaptater {
         for(MOTable moTable : moManager.getMoTables()){
             for(MOVariable moColumn : moTable.getColumns()){
                 if(moColumn.getName().equals(name)){
-                    return moTable.getOid();
+                    return moColumn.getOid();
                 }
             }
         }

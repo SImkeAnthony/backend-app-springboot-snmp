@@ -31,6 +31,6 @@ public class Service {
 
     @Override
     public String toString(){
-        return String.join(" : ", id.toString(),name,description,port);
+        return String.join(" : ",name,description,port);
     }
 }
