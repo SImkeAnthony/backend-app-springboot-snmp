@@ -5,6 +5,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistance
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.tomcat.util.json.ParseException;
 import org.aspectj.weaver.ast.Var;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
@@ -153,11 +154,12 @@ public class SnmpListener implements ResponseListener {
     }
     private void processMaterialsVariableBindings(String hostname){
         System.out.println("Process materials");
-        if(checkIfPduContainsIndex(getMaterialsVariableBindings(),"mProcessorTable") | checkIfPduContainsIndex(getMaterialsVariableBindings(),"mProcessorTable")){
+        //getMaterialsVariableBindings().forEach(System.out::println);
+        if(checkIfPduContainsNumber(getMaterialsVariableBindings(),"mProcessorTable") || checkIfPduContainsIndex(getMaterialsVariableBindings(),"mProcessorTable")){
             processProcessor(hostname);
-        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),"mDiskTable") | checkIfPduContainsIndex(getMaterialsVariableBindings(),"mDiskTable")){
+        }else if(checkIfPduContainsNumber(getMaterialsVariableBindings(),"mDiskTable") || checkIfPduContainsIndex(getMaterialsVariableBindings(),"mDiskTable")){
             processDisk(hostname);
-        }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),"mVStorageTable") | checkIfPduContainsIndex(getMaterialsVariableBindings(),"mVStorageTable")){
+        }else if(checkIfPduContainsNumber(getMaterialsVariableBindings(),"mVStorageTable") || checkIfPduContainsIndex(getMaterialsVariableBindings(),"mVStorageTable")){
             processVStorage(hostname);
         }else{
             System.err.println("Error can't supported the pdu received : to process materials");
@@ -177,7 +179,7 @@ public class SnmpListener implements ResponseListener {
     private void processDisk(String hostname) {
         System.out.println("Process disk");
         String tableName = "mDiskTable";
-        if(checkIfPduContainsIndex(getMaterialsVariableBindings(),tableName)){
+        if(checkIfPduContainsNumber(getMaterialsVariableBindings(),tableName)){
             setMPersiStorageNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
         }else if(checkIfPduContainsIndex(getMaterialsVariableBindings(),tableName)){
             addDisk(hostname,getMaterialsVariableBindings());
@@ -210,20 +212,23 @@ public class SnmpListener implements ResponseListener {
 
     private void addInterface(String hostname,List<? extends VariableBinding> parameters){
         MOManager ifManager = getOidPersistanceAdaptater().getMOManagerByName("interfaces");
-        System.out.println("add if host : "+hostname);
         Interface domainInterface = new Interface("","","");
         parameters.forEach(variableBinding -> {
-            String oid = variableBinding.getOid().format();
-            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifDescription",ifManager))){
-                domainInterface.setDescription(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifPhysAddress",ifManager))){
-                domainInterface.setMacAddress(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifAddress",ifManager))){
-                domainInterface.setIpAddress(variableBinding.getVariable().toString());
-            } else if (oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifIndex",ifManager))) {
-                //don't manage id for entity is not registered yet
-            } else {
-                System.err.println("Error can't supported OID "+oid+" to add interface");
+            try{
+                String oid = variableBinding.getOid().format();
+                if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifDescription",ifManager))){
+                    domainInterface.setDescription(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifPhysAddress",ifManager))){
+                    domainInterface.setMacAddress(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifAddress",ifManager))){
+                    domainInterface.setIpAddress(variableBinding.getVariable().toString());
+                } else if (oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("ifIndex",ifManager))) {
+                    //don't manage id for entity is not registered yet
+                } else {
+                    System.err.println("Error can't supported OID "+oid+" to add interface");
+                }
+            }catch (Exception e){
+                System.err.println("Error to add interface : "+e.getMessage());
             }
         });
         if(domainInterface.getDescription().isEmpty() || domainInterface.getMacAddress().isEmpty() || domainInterface.getIpAddress().isEmpty()){
@@ -241,15 +246,21 @@ public class SnmpListener implements ResponseListener {
         MOManager serviceManager = getOidPersistanceAdaptater().getMOManagerByName("services");
         Service service =new Service("","","");
         parameters.forEach(variableBinding -> {
-            String oid = variableBinding.getOid().format();
-            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sName",serviceManager))){
-                service.setName(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sDescription",serviceManager))){
-                service.setDescription(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sPort",serviceManager))){
-                service.setPort(variableBinding.getVariable().toString());
-            }else {
-                System.err.println("Error can't supported OID "+oid+" to add service");
+            try{
+                String oid = variableBinding.getOid().format();
+                if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sName",serviceManager))){
+                    service.setName(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sDescription",serviceManager))){
+                    service.setDescription(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sPort",serviceManager))){
+                    service.setPort(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("sIndex",serviceManager))){
+                    //don't manage index of service is not registered yet
+                }else {
+                    System.err.println("Error can't supported OID "+oid+" to add service");
+                }
+            }catch (Exception e){
+                System.err.println("Error to add service : "+e.getMessage());
             }
         });
         if(service.getName().isEmpty() || service.getDescription().isEmpty() || service.getPort().isEmpty()){}
@@ -264,18 +275,25 @@ public class SnmpListener implements ResponseListener {
     private void addProcessor(String hostname, List<? extends VariableBinding> parameters){
         MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
         Processor processor = new Processor("",0,0,0.0);
+        System.out.println("add processor");
         parameters.forEach(variableBinding -> {
-            String oid = variableBinding.getOid().format();
-            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorRef",materialsManager))){
-                processor.setReference(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorCore",materialsManager))){
-                processor.setCore(variableBinding.getVariable().toInt());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorVCore",materialsManager))){
-                processor.setVCore(variableBinding.getVariable().toInt());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorFreq",materialsManager))){
-                processor.setFrequency(Double.valueOf(variableBinding.getVariable().toString()));
-            }else {
-                System.err.println("Error can't supported OID "+oid+" to add processor");
+            try{
+                String oid = variableBinding.getOid().format();
+                if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorRef",materialsManager))){
+                    processor.setReference(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorCore",materialsManager))){
+                    processor.setCore(Integer.parseInt(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorVCore",materialsManager))){
+                    processor.setVCore(Integer.parseInt(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorFreq",materialsManager))){
+                    processor.setFrequency(Double.valueOf(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mProcessorIndex",materialsManager))){
+                    //don't manage index for a not registered processor
+                }else {
+                    System.err.println("Error can't supported OID "+oid+" to add processor");
+                }
+            }catch (Exception e){
+                System.err.println("Error to add processor : "+e.getMessage());
             }
         });
         if(processor.getReference().isEmpty()|processor.getCore()==0|processor.getVCore()==0|processor.getFrequency()==0.0){}
@@ -291,15 +309,21 @@ public class SnmpListener implements ResponseListener {
         MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
         PersistentStorage persistentStorage = new PersistentStorage("",0.0,0.0);
         parameters.forEach(variableBinding -> {
-            String oid = variableBinding.getOid().format();
-            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskRef",materialsManager))){
-                persistentStorage.setReference(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskAvailable",materialsManager))){
-                persistentStorage.setAvailable(Double.valueOf(variableBinding.getVariable().toString()));
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskUsed",materialsManager))){
-                persistentStorage.setUsed(Double.valueOf(variableBinding.getVariable().toString()));
-            }else {
-                System.err.println("Error can't supported OID "+oid+" to add disk");
+            try{
+                String oid = variableBinding.getOid().format();
+                if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskRef",materialsManager))){
+                    persistentStorage.setReference(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskAvailable",materialsManager))){
+                    persistentStorage.setAvailable(Double.valueOf(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskUsed",materialsManager))){
+                    persistentStorage.setUsed(Double.valueOf(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mDiskIndex",materialsManager))){
+                    //don't manage index for a not registered disk
+                }else {
+                    System.err.println("Error can't supported OID "+oid+" to add disk");
+                }
+            }catch (Exception e){
+                System.err.println("Error to add disk : "+e.getMessage());
             }
         });
         if(persistentStorage.getReference().isEmpty()|persistentStorage.getAvailable()==0.0|persistentStorage.getUsed()==0.0){}
@@ -315,17 +339,23 @@ public class SnmpListener implements ResponseListener {
         MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
         VolatileStorage volatileStorage = new VolatileStorage("",0.0,0.0,0.0);
         parameters.forEach(variableBinding -> {
-            String oid = variableBinding.getOid().format();
-            if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageRef",materialsManager))){
-                volatileStorage.setReference(variableBinding.getVariable().toString());
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageAvailable",materialsManager))){
-                volatileStorage.setAvailable(Double.valueOf(variableBinding.getVariable().toString()));
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageFreq",materialsManager))){
-                volatileStorage.setFrequency(Double.valueOf(variableBinding.getVariable().toString()));
-            }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageLatency",materialsManager))){
-                volatileStorage.setLatency(Double.valueOf(variableBinding.getVariable().toString()));
-            }else {
-                System.err.println("Error can't supported OID "+oid+" to add volatile storage");
+            try{
+                String oid = variableBinding.getOid().format();
+                if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageRef",materialsManager))){
+                    volatileStorage.setReference(variableBinding.getVariable().toString());
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageAvailable",materialsManager))){
+                    volatileStorage.setAvailable(Double.valueOf(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageFreq",materialsManager))){
+                    volatileStorage.setFrequency(Double.valueOf(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageLatency",materialsManager))){
+                    volatileStorage.setLatency(Double.valueOf(variableBinding.getVariable().toString()));
+                }else if(oid.equals(getOidPersistanceAdaptater().getOIDColumnByName("mVStorageIndex",materialsManager))){
+                    //don't manage index for a not registered VStorage
+                }else {
+                    System.err.println("Error can't supported OID "+oid+" to add volatile storage");
+                }
+            }catch (Exception e){
+                System.err.println("Error to add VStorage : "+e.getMessage());
             }
         });
         if(volatileStorage.getReference().isEmpty()|volatileStorage.getAvailable()==0.0|volatileStorage.getFrequency()==0.0|volatileStorage.getLatency()==0.0){}

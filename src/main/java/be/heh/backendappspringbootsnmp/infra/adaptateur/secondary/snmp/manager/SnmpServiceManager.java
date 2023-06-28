@@ -36,25 +36,26 @@ public class SnmpServiceManager extends AbstractSnmpManager{
     }
     private void completeService(int index,String ipAddress){
         try{
+            String oidIndex = getOidPersistanceAdaptater().getOidNumberIndexOfTable("sTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("sTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
-            initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("sTable").getValue0()),String.valueOf(index)));
+            initPDU(PDU.GET,index,oidIndex);
+            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
-        }catch (IOException | ParseException | InterruptedException e) {
+        }catch (IOException | InterruptedException e) {
             System.err.println("Error complete service : "+e.getMessage());
         }
     }
     private void completeServicesForMachineEntity(String ipAddress){
         int ifNumber = getServiceNumber(ipAddress);
-        for(int i = 0;i<ifNumber;i++){
+        for(int i = 1;i<=ifNumber;i++){
             completeService(i,ipAddress);
         }
     }

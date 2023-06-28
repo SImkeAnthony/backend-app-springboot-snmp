@@ -42,6 +42,7 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("ifTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET,index,oidIndex);
+            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
@@ -62,9 +63,5 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
     }
     public void completeInterfacesForEachMachineEntities(List<String> ipAddress){
         ipAddress.forEach(this::completeInterfaceForMachineEntity);
-        getSnmpListener().getMachineEntities().forEach(machineEntity -> {
-            System.out.println(machineEntity);
-            System.out.println(machineEntity.getInterfaces());
-        });
     }
 }

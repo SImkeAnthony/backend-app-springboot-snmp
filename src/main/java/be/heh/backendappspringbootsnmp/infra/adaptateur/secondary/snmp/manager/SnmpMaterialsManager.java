@@ -25,6 +25,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
+            System.out.println("send PDU : "+getPdu()+" at "+ipAddress);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
             getSnmp().close();
@@ -36,20 +37,20 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeProcessor(int index,String ipAddress){
         try{
+            String oidIndex = getOidPersistanceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mProcessorTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
-            initPDU(PDU.GET);
-            getPdu().getVariableBindings().forEach(System.out::println);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue0()),String.valueOf(index)));
+            initPDU(PDU.GET,index,oidIndex);
+            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
-            initPDU(PDU.GET);
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
-        }catch (IOException | ParseException | InterruptedException e) {
+            getSnmp().close();
+        }catch (IOException | InterruptedException e) {
             System.err.println("Error complete processor : "+e.getMessage());
         }
     }
@@ -62,6 +63,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
+            System.out.println("send PDU : "+getPdu()+" at "+ipAddress);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
             getSnmp().close();
@@ -73,19 +75,20 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeDisk(int index,String ipAddress){
         try{
+            String oidIndex = getOidPersistanceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mDiskTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
-            initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue0()),String.valueOf(index)));
+            initPDU(PDU.GET,index,oidIndex);
+            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
-            initPDU(PDU.GET);
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
-        }catch (IOException | ParseException | InterruptedException e) {
+            getSnmp().close();
+        }catch (IOException | InterruptedException e) {
             System.err.println("Error complete disk : "+e.getMessage());
         }
     }
@@ -98,6 +101,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
+            System.out.println("send PDU : "+getPdu()+" at "+ipAddress);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
             getSnmp().close();
@@ -109,37 +113,45 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeVStorage(int index,String ipAddress){
         try{
+            String oidIndex = getOidPersistanceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
             getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
             getOidPersistanceAdaptater().getColumnOfTable("mVStorageTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
-            initPDU(PDU.GET);
-            getPdu().add(new VariableBinding(new OID(getOidPersistanceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue0()),String.valueOf(index)));
+            initPDU(PDU.GET,index,oidIndex);
+            getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
-            initPDU(PDU.GET);
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
-        }catch (IOException | ParseException | InterruptedException e) {
+            getSnmp().close();
+        }catch (IOException | InterruptedException e) {
             System.err.println("Error complete volatile storage : "+e.getMessage());
         }
     }
     private void completeMaterialsForMachineEntity(String ipAddress){
         int mProcessorNumber = getProcessorNumber(ipAddress);
-        for(int i = 0;i<mProcessorNumber;i++){
+        for(int i = 1;i<=mProcessorNumber;i++){
             completeProcessor(i,ipAddress);
         }
         int mDiskNumber = getDiskNumber(ipAddress);
-        for(int i=0;i<mDiskNumber;i++){
+        for(int i=1;i<=mDiskNumber;i++){
             completeDisk(i,ipAddress);
         }
         int mVStorage = getVStorageNumber(ipAddress);
-        for(int i=0;i<mVStorage;i++){
+        for(int i=1;i<=mVStorage;i++){
             completeVStorage(i,ipAddress);
         }
     }
     public void completeMaterialsForEachMachineEntities(List<String> ipAddress){
         ipAddress.forEach(this::completeMaterialsForMachineEntity);
+        getSnmpListener().getMachineEntities().forEach(machineEntity -> {
+            System.out.println(machineEntity);
+            System.out.println(machineEntity.getInterfaces());
+            System.out.println(machineEntity.getProcessors());
+            System.out.println(machineEntity.getPersistentStorages());
+            System.out.println(machineEntity.getVolatileStorages());
+        });
     }
 }

@@ -14,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.javatuples.Pair;
 import org.snmp4j.security.dh.DHOperations;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class SnmpManagerAdaptater implements SnmpManagerPortOut {
@@ -32,14 +30,14 @@ public class SnmpManagerAdaptater implements SnmpManagerPortOut {
     @Override
     public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress){
         snmpSystemManager.completeMachineEntitiesWithSystemVariables(ipAddress);
-        List<String> ipReachableSnmp = new ArrayList<>();
+        Set<String> ipReachableSnmp = new HashSet<>();
         for(Map.Entry<Integer, Pair<String,Boolean>> entry : snmpSystemManager.getSnmpListener().getRequestController().entrySet()){
             if(entry.getValue().getValue1()){
                 ipReachableSnmp.add(entry.getValue().getValue0());
             }
         }
-        snmpInterfaceManager.completeInterfacesForEachMachineEntities(ipReachableSnmp);
-        //snmpMaterialsManager.completeMaterialsForEachMachineEntities(ipAddress);
+        snmpInterfaceManager.completeInterfacesForEachMachineEntities(ipReachableSnmp.stream().toList());
+        snmpMaterialsManager.completeMaterialsForEachMachineEntities(ipReachableSnmp.stream().toList());
         //snmpServiceManager.completeServicesForEachMachineEntities(ipAddress);
         return snmpSystemManager.getSnmpListener().getMachineEntities();
     }
