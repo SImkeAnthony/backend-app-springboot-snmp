@@ -45,7 +45,6 @@ public class SnmpServiceManager extends AbstractSnmpManager{
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
-            initPDU(PDU.GET);
             System.out.println("send PDU : "+getPdu()+" at "+ipAddress+" for index "+index);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
@@ -61,5 +60,13 @@ public class SnmpServiceManager extends AbstractSnmpManager{
     }
     public void completeServicesForEachMachineEntities(List<String> ipAddress){
         ipAddress.forEach(this::completeServicesForMachineEntity);
+        getSnmpListener().getMachineEntities().forEach(machineEntity -> {
+            System.out.println(machineEntity);
+            System.out.println(machineEntity.getInterfaces());
+            System.out.println(machineEntity.getProcessors());
+            System.out.println(machineEntity.getPersistentStorages());
+            System.out.println(machineEntity.getVolatileStorages());
+            System.out.println(machineEntity.getServices());
+        });
     }
 }

@@ -146,12 +146,5 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     public void completeMaterialsForEachMachineEntities(List<String> ipAddress){
         ipAddress.forEach(this::completeMaterialsForMachineEntity);
-        getSnmpListener().getMachineEntities().forEach(machineEntity -> {
-            System.out.println(machineEntity);
-            System.out.println(machineEntity.getInterfaces());
-            System.out.println(machineEntity.getProcessors());
-            System.out.println(machineEntity.getPersistentStorages());
-            System.out.println(machineEntity.getVolatileStorages());
-        });
     }
 }

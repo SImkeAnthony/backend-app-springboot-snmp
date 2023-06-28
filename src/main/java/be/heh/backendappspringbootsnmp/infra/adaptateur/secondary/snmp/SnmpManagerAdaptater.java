@@ -38,7 +38,7 @@ public class SnmpManagerAdaptater implements SnmpManagerPortOut {
         }
         snmpInterfaceManager.completeInterfacesForEachMachineEntities(ipReachableSnmp.stream().toList());
         snmpMaterialsManager.completeMaterialsForEachMachineEntities(ipReachableSnmp.stream().toList());
-        //snmpServiceManager.completeServicesForEachMachineEntities(ipAddress);
+        snmpServiceManager.completeServicesForEachMachineEntities(ipReachableSnmp.stream().toList());
         return snmpSystemManager.getSnmpListener().getMachineEntities();
     }
 
