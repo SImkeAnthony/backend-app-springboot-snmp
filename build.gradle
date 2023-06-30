@@ -48,6 +48,7 @@ dependencies {
 
     //json
     implementation 'org.json:json:20230227'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
 
     //Nmap
     implementation fileTree(dir:'libs',includes: ['*.jar'])

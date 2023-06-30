@@ -5,10 +5,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistance
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.tomcat.util.json.ParseException;
-import org.aspectj.weaver.ast.Var;
 import org.javatuples.Pair;
-import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.event.ResponseListener;
@@ -77,11 +74,9 @@ public class SnmpListener implements ResponseListener {
                 }
             }else {
                 System.err.println("Error status in response PDU : "+event.getResponse().getErrorStatus()+" => "+event.getResponse().getErrorStatusText());
-                //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
             }
         } else{
             //System.out.println("host is not reachable or incompatible with SNMPv1");
-            //addUnknownMachineEntity(getRequestController().get(event.getRequest().getRequestID().getValue()).getValue0());
         }
         getLockResponseCounter().increment();
     }
@@ -119,12 +114,8 @@ public class SnmpListener implements ResponseListener {
             getManagerController().put("services",4);
         }
     }
-
-    private void addUnknownMachineEntity(String ipAddr){
-        getMachineEntities().add(new MachineEntity("unknown","unknown",false));
-    }
     private void processSystemVariableBindings(){
-        System.out.println("Process system");
+        //System.out.println("Process system");
         MOManager sysManager = getOidPersistanceAdaptater().getMOManagerByName("system");
         MachineEntity machineEntity = new MachineEntity("","",true);
         getSystemVariableBindings().forEach(variableBinding -> {
@@ -143,7 +134,7 @@ public class SnmpListener implements ResponseListener {
         }
     }
     private void processInterfacesVariableBindings(String hostname){
-        System.out.println("Process interfaces");
+        //System.out.println("Process interfaces");
         if(checkIfPduContainsNumber(getInterfacesVariableBindings(),"ifTable")){
             setIfNumber(getNumberFromVariableBindings(getInterfacesVariableBindings(),"ifTable"));
         }else if(checkIfPduContainsIndex(getInterfacesVariableBindings(),"ifTable")){
@@ -153,8 +144,7 @@ public class SnmpListener implements ResponseListener {
         }
     }
     private void processMaterialsVariableBindings(String hostname){
-        System.out.println("Process materials");
-        //getMaterialsVariableBindings().forEach(System.out::println);
+        //System.out.println("Process materials");
         if(checkIfPduContainsNumber(getMaterialsVariableBindings(),"mProcessorTable") || checkIfPduContainsIndex(getMaterialsVariableBindings(),"mProcessorTable")){
             processProcessor(hostname);
         }else if(checkIfPduContainsNumber(getMaterialsVariableBindings(),"mDiskTable") || checkIfPduContainsIndex(getMaterialsVariableBindings(),"mDiskTable")){
@@ -166,7 +156,7 @@ public class SnmpListener implements ResponseListener {
         }
     }
     private void processProcessor(String hostname) {
-        System.out.println("Process processor");
+        //System.out.println("Process processor");
         String tableName = "mProcessorTable";
         if(checkIfPduContainsNumber(getMaterialsVariableBindings(),tableName)){
             setMProcessorNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
@@ -177,7 +167,7 @@ public class SnmpListener implements ResponseListener {
         }
     }
     private void processDisk(String hostname) {
-        System.out.println("Process disk");
+        //System.out.println("Process disk");
         String tableName = "mDiskTable";
         if(checkIfPduContainsNumber(getMaterialsVariableBindings(),tableName)){
             setMPersiStorageNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
@@ -189,7 +179,7 @@ public class SnmpListener implements ResponseListener {
     }
 
     private void processVStorage(String hostname) {
-        System.out.println("Process vStorage");
+        //System.out.println("Process vStorage");
         String tableName = "mVStorageTable";
         if(checkIfPduContainsNumber(getMaterialsVariableBindings(),tableName)){
             setMVolStorageNumber(getNumberFromVariableBindings(getMaterialsVariableBindings(),tableName));
@@ -200,7 +190,7 @@ public class SnmpListener implements ResponseListener {
         }
     }
     private void processServicesVariableBindings(String hostname){
-        System.out.println("Process service");
+        //System.out.println("Process service");
         if(checkIfPduContainsNumber(getServicesVariableBindings(),"sTable")){
             setSNumber(getNumberFromVariableBindings(getServicesVariableBindings(),"sTable"));
         }else if(checkIfPduContainsIndex(getServicesVariableBindings(),"sTable")){
@@ -275,7 +265,6 @@ public class SnmpListener implements ResponseListener {
     private void addProcessor(String hostname, List<? extends VariableBinding> parameters){
         MOManager materialsManager = getOidPersistanceAdaptater().getMOManagerByName("materials");
         Processor processor = new Processor("",0,0,0.0);
-        System.out.println("add processor");
         parameters.forEach(variableBinding -> {
             try{
                 String oid = variableBinding.getOid().format();

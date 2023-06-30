@@ -1,5 +1,6 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,10 @@ public class Service {
     @Getter
     @Setter
     private String port;
+    @Getter
+    @Setter
+    @JsonBackReference
+    private MachineEntity machineEntity;
 
     public Service(String name,String description,String port){
         setName(name);

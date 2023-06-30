@@ -3,20 +3,12 @@ import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.pool.TypePool;
-import org.javatuples.Pair;
 import org.nmap4j.Nmap4j;
-import org.nmap4j.core.nmap.ExecutionResults;
 import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
 import org.nmap4j.data.host.Address;
-import org.nmap4j.data.host.os.PortUsed;
-import org.nmap4j.data.host.ports.Port;
 import org.nmap4j.data.nmaprun.Host;
-import org.nmap4j.data.nmaprun.host.ports.port.State;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 

@@ -1,5 +1,7 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,18 +23,24 @@ public class MachineEntity {
     private Boolean snmp;
     @Getter
     @Setter
+    @JsonManagedReference
     private List<Interface> interfaces = new ArrayList<>();
     @Getter
     @Setter
+    @JsonManagedReference
     private List<Processor> processors = new ArrayList<>();
     @Getter
     @Setter
+    @JsonManagedReference
     private List<PersistentStorage> persistentStorages = new ArrayList<>();
     @Getter
     @Setter
+    @JsonManagedReference
     private List<VolatileStorage> volatileStorages = new ArrayList<>();
     @Getter
-    @Setter List<Service> services = new ArrayList<>();
+    @Setter
+    @JsonManagedReference
+    private List<Service> services = new ArrayList<>();
 
     public MachineEntity(String hostname,String os,Boolean snmp){
         setHostname(hostname);

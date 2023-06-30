@@ -12,7 +12,6 @@ import org.snmp4j.agent.mo.MOTableSubIndex;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.SMIConstants;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

@@ -2,17 +2,14 @@ package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpInterfaceManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpMaterialsManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpServiceManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpSystemManager;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.javatuples.Pair;
-import org.snmp4j.security.dh.DHOperations;
 
 import java.util.*;
 

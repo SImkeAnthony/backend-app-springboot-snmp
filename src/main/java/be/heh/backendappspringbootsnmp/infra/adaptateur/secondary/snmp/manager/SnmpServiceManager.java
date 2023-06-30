@@ -5,11 +5,8 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.VariableBinding;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 
 public class SnmpServiceManager extends AbstractSnmpManager{
@@ -25,6 +22,7 @@ public class SnmpServiceManager extends AbstractSnmpManager{
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
+            System.out.println("send PDU : "+getPdu()+" at "+ipAddress);
             getSnmp().send(getPdu(),getCommunityTarget(ipAddress),null,getSnmpListener());
             getLockResponseCounter().waitResponse();
             getSnmp().close();
@@ -60,13 +58,5 @@ public class SnmpServiceManager extends AbstractSnmpManager{
     }
     public void completeServicesForEachMachineEntities(List<String> ipAddress){
         ipAddress.forEach(this::completeServicesForMachineEntity);
-        getSnmpListener().getMachineEntities().forEach(machineEntity -> {
-            System.out.println(machineEntity);
-            System.out.println(machineEntity.getInterfaces());
-            System.out.println(machineEntity.getProcessors());
-            System.out.println(machineEntity.getPersistentStorages());
-            System.out.println(machineEntity.getVolatileStorages());
-            System.out.println(machineEntity.getServices());
-        });
     }
 }

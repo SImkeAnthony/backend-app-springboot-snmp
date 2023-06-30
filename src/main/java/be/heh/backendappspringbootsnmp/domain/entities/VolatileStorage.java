@@ -1,5 +1,6 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,10 @@ public class VolatileStorage {
     @Getter
     @Setter
     private Double latency;
+    @Getter
+    @Setter
+    @JsonBackReference
+    private MachineEntity machineEntity;
 
     public VolatileStorage(String reference,Double available,Double frequency,Double latency){
         setReference(reference);

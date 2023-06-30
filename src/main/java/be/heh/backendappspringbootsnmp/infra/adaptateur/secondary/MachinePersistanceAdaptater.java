@@ -1,9 +1,6 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 
-import be.heh.backendappspringbootsnmp.domain.entities.Interface;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
-import be.heh.backendappspringbootsnmp.domain.entities.PersistentStorage;
-import be.heh.backendappspringbootsnmp.domain.entities.Service;
 import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
@@ -40,6 +37,14 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
             machine.setPersistentStorages(persistentStoragePersistanceAdaptater.getAllPersistentStoragesByIdMachine(machine.getId()));
             machine.setVolatileStorages(volatileStoragePersistanceAdaptater.getAllVolatileStoragesByIdMachine(machine.getId()));
             machine.setServices(servicePersistenceAdaptater.getAllServiceByIdMachine(machine.getId()));
+        });
+        //set reference to machineEntity
+        getMachineEntities().forEach(machineEntity -> {
+            machineEntity.getInterfaces().forEach(anInterface -> {anInterface.setMachineEntity(machineEntity);});
+            machineEntity.getProcessors().forEach(processor -> {processor.setMachineEntity(machineEntity);});
+            machineEntity.getPersistentStorages().forEach(persistentStorage -> {persistentStorage.setMachineEntity(machineEntity);});
+            machineEntity.getVolatileStorages().forEach(volatileStorage -> {volatileStorage.setMachineEntity(machineEntity);});
+            machineEntity.getServices().forEach(service -> {service.setMachineEntity(machineEntity);});
         });
         return getMachineEntities();
     }

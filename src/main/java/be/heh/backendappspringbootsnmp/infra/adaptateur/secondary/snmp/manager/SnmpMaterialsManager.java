@@ -5,11 +5,8 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import org.javatuples.Pair;
 import org.snmp4j.PDU;
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.VariableBinding;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 
 public class SnmpMaterialsManager extends AbstractSnmpManager{

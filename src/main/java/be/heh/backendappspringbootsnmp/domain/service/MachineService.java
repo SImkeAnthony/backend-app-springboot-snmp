@@ -49,8 +49,8 @@ public class MachineService implements MachinePortIn {
             //getIpAddress().forEach(System.out::println);
             //get infos
             completeListMachineEntities();
-            //manageList();
-            //setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+            manageList();
+            setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             System.out.println("Error scanning ip : "+e.getMessage());
         } catch (InterruptedException e) {
@@ -69,7 +69,7 @@ public class MachineService implements MachinePortIn {
             setIpAddress(ipMerge.stream().toList());
             //get infos
             updateListMachineEntities();
-            //manageList();
+            manageList();
             setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             System.out.println("Error scanning ip : "+e.getMessage());
@@ -94,7 +94,6 @@ public class MachineService implements MachinePortIn {
     }
     private void manageList(){
         if(!isManaged()){
-            managedUnknownHost();
             if(getRegisterMachineEntities().isEmpty()){
                 getMachinePortOut().registerMachineEntities(getDiscoverMachineEntities());
             }else{
@@ -106,19 +105,6 @@ public class MachineService implements MachinePortIn {
             }
         }
         setManaged(true);
-    }
-    private void managedUnknownHost(){
-        getDiscoverMachineEntities().parallelStream().forEach(machineEntity -> {
-            if(!machineEntity.getSnmp()){
-                int index = getDiscoverMachineEntities().indexOf(machineEntity);
-                try {
-                    List<String> ipAddress = new ArrayList<>();
-                    getDiscoverMachineEntities().set(index,deviceScannerPortOut.getAllInfoOfMachineEntity(machineEntity,ipAddress));
-                } catch (NMapExecutionException | NMapInitializationException e) {
-                    System.err.println("Error completed unknown machine entity : "+e.getMessage());
-                }
-            }
-        });
     }
     private boolean alreadyRegisterByHostname(MachineEntity machineEntity){
         for(MachineEntity registerEntity : getRegisterMachineEntities()){

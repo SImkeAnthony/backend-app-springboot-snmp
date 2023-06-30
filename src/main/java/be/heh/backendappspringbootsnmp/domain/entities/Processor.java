@@ -1,5 +1,6 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,10 @@ public class Processor {
     @Getter
     @Setter
     private Double frequency;
+    @Getter
+    @Setter
+    @JsonBackReference
+    private MachineEntity machineEntity;
 
     public Processor(String reference,Integer core, Integer vCore,Double frequency){
         setReference(reference);

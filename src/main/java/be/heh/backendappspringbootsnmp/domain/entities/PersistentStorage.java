@@ -1,5 +1,6 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,10 @@ public class PersistentStorage {
     @Getter
     @Setter
     private Double used;
+    @Getter
+    @Setter
+    @JsonBackReference
+    private MachineEntity machineEntity;
 
     public PersistentStorage(String reference,Double available,Double used){
         setReference(reference);

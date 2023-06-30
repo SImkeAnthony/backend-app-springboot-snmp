@@ -1,8 +1,8 @@
 package be.heh.backendappspringbootsnmp.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
-
 public class Interface {
     @Getter
     @Setter
@@ -16,6 +16,10 @@ public class Interface {
     @Getter
     @Setter
     private String ipAddress;
+    @Getter
+    @Setter
+    @JsonBackReference
+    private MachineEntity machineEntity;
 
     public Interface(String macAddress,String description,String ipAddress){
         setDescription(description);
