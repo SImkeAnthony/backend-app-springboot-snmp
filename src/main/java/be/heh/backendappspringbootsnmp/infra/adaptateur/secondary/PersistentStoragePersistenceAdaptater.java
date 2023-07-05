@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class PersistentStoragePersistanceAdaptater {
+public class PersistentStoragePersistenceAdaptater {
     @Getter
     private final PersistentStorageRepository persistentStorageRepository;
     @Getter

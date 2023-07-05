@@ -16,7 +16,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue0());
+            getOIDs().add(getSnmpListener().getOidPersistenceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -33,11 +33,11 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeProcessor(int index,String ipAddress){
         try{
-            String oidIndex = getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue1();
+            String oidIndex = getSnmpListener().getOidPersistenceAdaptater().getOidNumberIndexOfTable("mProcessorTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOIDHostname());
-            getSnmpListener().getOidPersistanceAdaptater().getColumnOfTable("mProcessorTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+            getOIDs().add(getSnmpListener().getOidPersistenceAdaptater().getOIDHostname());
+            getSnmpListener().getOidPersistenceAdaptater().getColumnOfTable("mProcessorTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET,index,oidIndex);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
@@ -54,7 +54,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue0());
+            getOIDs().add(getSnmpListener().getOidPersistenceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -71,11 +71,11 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeDisk(int index,String ipAddress){
         try{
-            String oidIndex = getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue1();
+            String oidIndex = getSnmpListener().getOidPersistenceAdaptater().getOidNumberIndexOfTable("mDiskTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOIDHostname());
-            getSnmpListener().getOidPersistanceAdaptater().getColumnOfTable("mDiskTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+            getOIDs().add(getSnmpListener().getOidPersistenceAdaptater().getOIDHostname());
+            getSnmpListener().getOidPersistenceAdaptater().getColumnOfTable("mDiskTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET,index,oidIndex);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
@@ -92,7 +92,7 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue0());
+            getOIDs().add(getSnmpListener().getOidPersistenceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -109,11 +109,11 @@ public class SnmpMaterialsManager extends AbstractSnmpManager{
     }
     private void completeVStorage(int index,String ipAddress){
         try{
-            String oidIndex = getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue1();
+            String oidIndex = getSnmpListener().getOidPersistenceAdaptater().getOidNumberIndexOfTable("mVStorageTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOIDHostname());
-            getSnmpListener().getOidPersistanceAdaptater().getColumnOfTable("mVStorageTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+            getOIDs().add(getSnmpListener().getOidPersistenceAdaptater().getOIDHostname());
+            getSnmpListener().getOidPersistenceAdaptater().getColumnOfTable("mVStorageTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET,index,oidIndex);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));

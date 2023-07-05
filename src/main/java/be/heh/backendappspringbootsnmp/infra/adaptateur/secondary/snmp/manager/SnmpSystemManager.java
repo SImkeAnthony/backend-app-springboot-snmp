@@ -14,7 +14,7 @@ public class SnmpSystemManager extends AbstractSnmpManager{
     }
     private void initOIDForSystem(){
         getOIDs().clear();
-        getSnmpListener().getOidPersistanceAdaptater().getMoManagers().forEach(moManager -> {
+        getSnmpListener().getOidPersistenceAdaptater().getMoManagers().forEach(moManager -> {
             if(moManager.getName().equals("system")){
                 if(!moManager.getMoVariables().isEmpty()){
                     moManager.getMoVariables().forEach(moVariable -> {getOIDs().add(moVariable.getOid());});

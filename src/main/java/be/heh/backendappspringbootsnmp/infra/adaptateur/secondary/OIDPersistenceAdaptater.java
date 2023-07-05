@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class OIDPersistanceAdaptater {
+public class OIDPersistenceAdaptater {
     @Getter
     private final MibBrowser mibBrowser;
     @Getter

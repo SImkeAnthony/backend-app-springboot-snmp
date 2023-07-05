@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ProcessorPersistanceAdaptater {
+public class ProcessorPersistenceAdaptater {
     @Getter
     private final ProcessorRepository processorRepository;
     @Getter

@@ -12,14 +12,14 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 @RequiredArgsConstructor
-public class MachinePersistanceAdaptater implements MachinePortOut {
+public class MachinePersistenceAdaptater implements MachinePortOut {
 
     private final MachineRepository machineRepository;
     private final MachineMapper machineMapper;
-    private final InterfacePersistanceAdaptater interfacePersistanceAdaptater;
-    private final ProcessorPersistanceAdaptater processorPersistanceAdaptater;
-    private final PersistentStoragePersistanceAdaptater persistentStoragePersistanceAdaptater;
-    private final VolatileStoragePersistanceAdaptater volatileStoragePersistanceAdaptater;
+    private final InterfacePersistenceAdaptater interfacePersistenceAdaptater;
+    private final ProcessorPersistenceAdaptater processorPersistenceAdaptater;
+    private final PersistentStoragePersistenceAdaptater persistentStoragePersistenceAdaptater;
+    private final VolatileStoragePersistenceAdaptater volatileStoragePersistenceAdaptater;
     private final ServicePersistenceAdaptater servicePersistenceAdaptater;
     @Getter
     @Setter
@@ -32,10 +32,10 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
         setMachineJpaEntities(machineRepository.findAll());
         setMachineEntities(machineMapper.mapMachineJpaToDomain(getMachineJpaEntities()));
         getMachineEntities().forEach(machine->{
-            machine.setInterfaces(interfacePersistanceAdaptater.getAllInterfacesByIdMachine(machine.getId()));
-            machine.setProcessors(processorPersistanceAdaptater.getAllProcessorsByIdMachine(machine.getId()));
-            machine.setPersistentStorages(persistentStoragePersistanceAdaptater.getAllPersistentStoragesByIdMachine(machine.getId()));
-            machine.setVolatileStorages(volatileStoragePersistanceAdaptater.getAllVolatileStoragesByIdMachine(machine.getId()));
+            machine.setInterfaces(interfacePersistenceAdaptater.getAllInterfacesByIdMachine(machine.getId()));
+            machine.setProcessors(processorPersistenceAdaptater.getAllProcessorsByIdMachine(machine.getId()));
+            machine.setPersistentStorages(persistentStoragePersistenceAdaptater.getAllPersistentStoragesByIdMachine(machine.getId()));
+            machine.setVolatileStorages(volatileStoragePersistenceAdaptater.getAllVolatileStoragesByIdMachine(machine.getId()));
             machine.setServices(servicePersistenceAdaptater.getAllServiceByIdMachine(machine.getId()));
         });
         //set reference to machineEntity
@@ -71,10 +71,10 @@ public class MachinePersistanceAdaptater implements MachinePortOut {
         if(machineEntity.getId()==null){
             id = machineRepository.findByHostName(machineEntity.getHostname()).getId();
         }
-        interfacePersistanceAdaptater.registerInterfaces(machineEntity.getInterfaces(),id);
-        processorPersistanceAdaptater.registerProcessors(machineEntity.getProcessors(),id);
-        persistentStoragePersistanceAdaptater.registerPersistentStorages(machineEntity.getPersistentStorages(),id);
-        volatileStoragePersistanceAdaptater.registerVolatileStorages(machineEntity.getVolatileStorages(),id);
+        interfacePersistenceAdaptater.registerInterfaces(machineEntity.getInterfaces(),id);
+        processorPersistenceAdaptater.registerProcessors(machineEntity.getProcessors(),id);
+        persistentStoragePersistenceAdaptater.registerPersistentStorages(machineEntity.getPersistentStorages(),id);
+        volatileStoragePersistenceAdaptater.registerVolatileStorages(machineEntity.getVolatileStorages(),id);
         servicePersistenceAdaptater.registerServices(machineEntity.getServices(),id);
     }
 

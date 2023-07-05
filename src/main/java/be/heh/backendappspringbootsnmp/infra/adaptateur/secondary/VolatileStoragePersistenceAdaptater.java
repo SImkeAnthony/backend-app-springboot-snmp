@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class VolatileStoragePersistanceAdaptater {
+public class VolatileStoragePersistenceAdaptater {
     @Getter
     private final VolatileStorageRepository volatileStorageRepository;
     @Getter

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class InterfacePersistanceAdaptater {
+public class InterfacePersistenceAdaptater {
     @Getter
     private final InterfaceRepository interfaceRepository;
     @Getter

@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class MachinePersistanceAdaptaterTest extends AbstractIntegrationTest {
+public class MachinePersistenceAdaptaterTest extends AbstractIntegrationTest {
 
     @Autowired
     private MachineRepository machineRepository;
     private MachineMapper machineMapper;
-    private MachinePersistanceAdaptater machinePersistanceAdaptateur;
+    private MachinePersistenceAdaptater machinePersistenceAdaptater;
 
     @Test
     @Sql({"createMachineTable.sql","insertMachine.sql"})
