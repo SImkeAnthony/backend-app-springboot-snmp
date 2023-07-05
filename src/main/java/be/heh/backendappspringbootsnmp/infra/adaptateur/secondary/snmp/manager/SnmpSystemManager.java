@@ -1,6 +1,5 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager;
 
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockResponseCounter;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import org.javatuples.Pair;
@@ -10,12 +9,12 @@ import java.io.IOException;
 import java.util.List;
 
 public class SnmpSystemManager extends AbstractSnmpManager{
-    public SnmpSystemManager(SnmpListener snmpListener, OIDPersistanceAdaptater oidPersistanceAdaptater) {
-        super(snmpListener, oidPersistanceAdaptater);
+    public SnmpSystemManager(SnmpListener snmpListener) {
+        super(snmpListener);
     }
     private void initOIDForSystem(){
         getOIDs().clear();
-        getOidPersistanceAdaptater().getMoManagers().forEach(moManager -> {
+        getSnmpListener().getOidPersistanceAdaptater().getMoManagers().forEach(moManager -> {
             if(moManager.getName().equals("system")){
                 if(!moManager.getMoVariables().isEmpty()){
                     moManager.getMoVariables().forEach(moVariable -> {getOIDs().add(moVariable.getOid());});

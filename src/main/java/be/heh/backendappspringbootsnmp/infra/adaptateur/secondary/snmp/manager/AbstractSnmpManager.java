@@ -1,6 +1,5 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager;
 
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockRequestID;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockResponseCounter;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
@@ -56,8 +55,6 @@ public class AbstractSnmpManager {
     private LockRequestID lockRequestID = new LockRequestID(0);
     @Getter
     private final SnmpListener snmpListener;
-    @Getter
-    private final OIDPersistanceAdaptater oidPersistanceAdaptater;
 
     protected void initSnmpV1() throws IOException {
         setSnmp(new Snmp());

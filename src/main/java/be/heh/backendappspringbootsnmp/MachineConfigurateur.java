@@ -112,10 +112,10 @@ public class MachineConfigurateur {
         oidPersistanceAdaptater.setMibFile("personal-mib.json");
         oidPersistanceAdaptater.initMOManagers();
         snmpListener = new SnmpListener(oidPersistanceAdaptater);
-        snmpSystemManager = new SnmpSystemManager(snmpListener,oidPersistanceAdaptater);
-        snmpInterfaceManager = new SnmpInterfaceManager(snmpListener,oidPersistanceAdaptater);
-        snmpMaterialsManager = new SnmpMaterialsManager(snmpListener,oidPersistanceAdaptater);
-        snmpServiceManager = new SnmpServiceManager(snmpListener,oidPersistanceAdaptater);
+        snmpSystemManager = new SnmpSystemManager(snmpListener);
+        snmpInterfaceManager = new SnmpInterfaceManager(snmpListener);
+        snmpMaterialsManager = new SnmpMaterialsManager(snmpListener);
+        snmpServiceManager = new SnmpServiceManager(snmpListener);
         return new SnmpManagerAdaptater(snmpSystemManager,snmpInterfaceManager,snmpMaterialsManager,snmpServiceManager);
     }
 

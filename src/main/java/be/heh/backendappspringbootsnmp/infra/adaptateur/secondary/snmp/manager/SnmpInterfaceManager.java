@@ -1,6 +1,5 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager;
 
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistanceAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.LockResponseCounter;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.responder.SnmpListener;
 import org.javatuples.Pair;
@@ -11,15 +10,15 @@ import java.util.List;
 
 public class SnmpInterfaceManager extends AbstractSnmpManager{
 
-    public SnmpInterfaceManager(SnmpListener snmpListener, OIDPersistanceAdaptater oidPersistanceAdaptater) {
-        super(snmpListener, oidPersistanceAdaptater);
+    public SnmpInterfaceManager(SnmpListener snmpListener) {
+        super(snmpListener);
     }
 
     private int getInterfaceNumber(String ipAddress){
         try{
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOidNumberIndexOfTable("ifTable").getValue0());
+            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("ifTable").getValue0());
             setLockResponseCounter(new LockResponseCounter(1));
             getSnmpListener().setLockResponseCounter(getLockResponseCounter());
             initPDU(PDU.GET);
@@ -36,11 +35,11 @@ public class SnmpInterfaceManager extends AbstractSnmpManager{
     }
     private void completeInterface(int index,String ipAddress){
         try{
-            String oidIndex = getOidPersistanceAdaptater().getOidNumberIndexOfTable("ifTable").getValue1();
+            String oidIndex = getSnmpListener().getOidPersistanceAdaptater().getOidNumberIndexOfTable("ifTable").getValue1();
             initSnmpV1();
             getOIDs().clear();
-            getOIDs().add(getOidPersistanceAdaptater().getOIDHostname());
-            getOidPersistanceAdaptater().getColumnOfTable("ifTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
+            getOIDs().add(getSnmpListener().getOidPersistanceAdaptater().getOIDHostname());
+            getSnmpListener().getOidPersistanceAdaptater().getColumnOfTable("ifTable").forEach(moVariable -> {getOIDs().add(moVariable.getOid());});
             initPDU(PDU.GET,index,oidIndex);
             getSnmpListener().getRequestController().put(getPdu().getRequestID().getValue(), Pair.with(ipAddress,false));
             setLockResponseCounter(new LockResponseCounter(1));
