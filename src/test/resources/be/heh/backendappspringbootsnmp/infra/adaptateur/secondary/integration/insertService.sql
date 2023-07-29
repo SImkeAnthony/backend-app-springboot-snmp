@@ -1,0 +1,3 @@
+INSERT INTO service(name,description,port,id_machine) VALUES('bdd connection','soft service for the connection to Postgresql','4321',3);
+INSERT INTO service(name,description,port,id_machine) VALUES('planning web','service to access to the planning web','3030',2);
+INSERT INTO service(name,description,port,id_machine) VALUES('data collection service','the service to collect data metric of the server pool','6523/6522',2);

@@ -1,7 +1,10 @@
-package be.heh.backendappspringbootsnmp.infra.adaptateur.primary;
+package be.heh.backendappspringbootsnmp.infra.adaptateur.primary.integration;
 
+import be.heh.backendappspringbootsnmp.domain.entities.Interface;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
+import be.heh.backendappspringbootsnmp.domain.entities.Service;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
+import be.heh.backendappspringbootsnmp.infra.adaptateur.primary.MachineRestController;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +38,9 @@ public class MachineRestControllerTest {
     public void testGetAllMachineEntities() throws Exception {
 
         //Records
-        machineEntities.add(new MachineEntity("02-23-04-05-06-07","192.168.0.15","pc-1","pc",true));
-        machineEntities.add(new MachineEntity("02-23-04-05-06-08","192.168.0.1","routeur-1","routeur",false));
-        machineEntities.add(new MachineEntity("02-23-04-05-06-09","192.168.0.250","serveur-1","serveur",true));
+        machineEntities.add(new MachineEntity("machine1.local","windows",true));
+        machineEntities.add(new MachineEntity("machine2.local","linux ubuntu",false));
+        machineEntities.add(new MachineEntity("machine3.local","oracle",false));
 
         //Stub
         Mockito.when(machinePortIn.getAllMachineEntities()).thenReturn(machineEntities);
@@ -47,9 +50,10 @@ public class MachineRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
-                .andExpect(jsonPath("$[2].ipAdd",is("192.168.0.250")))
-                .andExpect(jsonPath("$[1].hostName",is("routeur-1")))
-                .andExpect(jsonPath("$[0].hostName",is("pc-1")));
+                .andExpect(jsonPath("$[2].hostname",is("machine3.local")))
+                .andExpect(jsonPath("$[1].os",is("linux ubuntu")))
+                .andExpect(jsonPath("$[0].snmp",is(true)))
+                .andReturn();
     }
 
 }

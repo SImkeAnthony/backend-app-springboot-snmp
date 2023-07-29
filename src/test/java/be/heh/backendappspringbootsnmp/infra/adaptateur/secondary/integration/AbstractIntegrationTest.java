@@ -1,4 +1,4 @@
-package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
+package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.integration;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
