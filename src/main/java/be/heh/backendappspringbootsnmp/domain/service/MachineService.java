@@ -6,6 +6,7 @@ import be.heh.backendappspringbootsnmp.domain.port.out.MachinePortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
 import be.heh.backendappspringbootsnmp.domain.port.out.SnmpManagerPortOut;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.nmap4j.core.nmap.NMapExecutionException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.*;
 
 @RequiredArgsConstructor
+@NoArgsConstructor (force = true)
 @Service
 public class MachineService implements MachinePortIn {
     @Getter
@@ -38,19 +40,22 @@ public class MachineService implements MachinePortIn {
     @Getter
     @Setter
     private boolean managed = false;
-
     @Override
     public Iterable<MachineEntity> getAllMachineEntities()  {
         try{
-            if(getIpAddress().isEmpty()){
+            if(getIpAddress().isEmpty() && getDeviceScannerPortOut()!=null){
                 //scan network
                 setIpAddress(getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254"));
             }
             //getIpAddress().forEach(System.out::println);
             //get infos
-            completeListMachineEntities();
-            manageList();
-            setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+
+            if(getMachinePortOut()!=null && getSnmpManagerPortOut()!=null){
+                completeListMachineEntities();
+                manageList();
+                assert machinePortOut != null;
+                setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+            }
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             System.out.println("Error scanning ip : "+e.getMessage());
         } catch (InterruptedException e) {
@@ -62,15 +67,19 @@ public class MachineService implements MachinePortIn {
     @Override
     public Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException {
         try{
-            Set<String> ipMerge = new HashSet<>();
-            List<String> ipScan  = getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
-            ipMerge.addAll(ipScan);
-            ipMerge.addAll(getIpAddress());
-            setIpAddress(ipMerge.stream().toList());
-            //get infos
-            updateListMachineEntities();
-            manageList();
-            setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+            if(getDeviceScannerPortOut()!=null){
+                Set<String> ipMerge = new HashSet<>();
+                List<String> ipScan  = getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
+                ipMerge.addAll(ipScan);
+                ipMerge.addAll(getIpAddress());
+                setIpAddress(ipMerge.stream().toList());
+            }
+            if(getMachinePortOut()!=null && getSnmpManagerPortOut()!=null){
+                //get infos
+                updateListMachineEntities();
+                manageList();
+                setRegisterMachineEntities(machinePortOut.getAllMachineEntities());
+            }
         } catch (IOException | NMapInitializationException | NMapExecutionException e) {
             System.out.println("Error scanning ip : "+e.getMessage());
         } catch (InterruptedException e) {
