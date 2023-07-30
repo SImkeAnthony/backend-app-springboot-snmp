@@ -41,4 +41,9 @@ public class PersistentStoragePersistenceAdaptater {
         }
     }
 
+    public List<PersistentStorage> getAllPersistentStorages(){
+        setPersistentStorageJpaList(persistentStorageRepository.findAll());
+        return persistentStorageMapper.mapPersiStorageJpaToDomain(getPersistentStorageJpaList());
+    }
+
 }

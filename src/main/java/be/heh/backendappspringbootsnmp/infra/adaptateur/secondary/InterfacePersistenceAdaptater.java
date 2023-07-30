@@ -41,4 +41,9 @@ public class InterfacePersistenceAdaptater {
         }
     }
 
+    public List<Interface> getAllInterfaces(){
+        setInterfaceJpaList(interfaceRepository.findAll());
+        return interfaceMapper.mapInterfaceJpaToDomain(getInterfaceJpaList());
+    }
+
 }

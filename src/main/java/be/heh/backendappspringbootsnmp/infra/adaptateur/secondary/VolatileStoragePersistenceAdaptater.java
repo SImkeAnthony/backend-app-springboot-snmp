@@ -41,4 +41,9 @@ public class VolatileStoragePersistenceAdaptater {
 
         }
     }
+
+    public List<VolatileStorage> getAllVolatileStorages(){
+        setVolatileStorageJpaList(volatileStorageRepository.findAll());
+        return volatileStorageMapper.mapVolatileStorageJpaToDomain(getVolatileStorageJpaList());
+    }
 }

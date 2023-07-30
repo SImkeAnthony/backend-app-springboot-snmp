@@ -40,4 +40,9 @@ public class ServicePersistenceAdaptater {
             }
         }
     }
+
+    public List<Service> getAllServices(){
+        setServiceJpaList(serviceRepository.findAll());
+        return serviceMapper.mapServiceJpaToDomain(getServiceJpaList());
+    }
 }

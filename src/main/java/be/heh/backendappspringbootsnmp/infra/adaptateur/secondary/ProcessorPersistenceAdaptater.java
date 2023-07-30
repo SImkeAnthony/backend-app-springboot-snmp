@@ -7,6 +7,7 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.jpaEntity.
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.tomcat.jni.Proc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,11 @@ public class ProcessorPersistenceAdaptater {
                 System.err.println("Error register entities : "+e.getMessage());
             }
         }
+    }
+
+    public List<Processor> getAllProcessors(){
+        setProcessorJpaList(processorRepository.findAll());
+        return processorMapper.mapProcessorJpaToDomain(getProcessorJpaList());
     }
 
 }

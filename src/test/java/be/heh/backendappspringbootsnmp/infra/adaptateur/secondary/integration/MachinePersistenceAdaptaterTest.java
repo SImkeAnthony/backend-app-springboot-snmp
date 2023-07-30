@@ -1,17 +1,18 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.integration;
 
+import be.heh.backendappspringbootsnmp.domain.entities.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.mapper.*;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.orm.*;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-
 /**
  * This test is a complete integration test for the data persistence because they use all secondary adaptater used for this !
  * The individual test for each module of persistence can be found at the same level of this test.
@@ -42,21 +42,8 @@ public class MachinePersistenceAdaptaterTest extends AbstractIntegrationTest {
     @Autowired
     private ServiceRepository serviceRepository;
 
-    /* Mapper */
-    private MachineMapper machineMapper;
-    private InterfaceMapper interfaceMapper;
-    private ProcessorMapper processorMapper;
-    private PersistentStorageMapper persistentStorageMapper;
-    private VolatileStorageMapper volatileStorageMapper;
-    private ServiceMapper serviceMapper;
-
     /* Adaptater */
     private MachinePersistenceAdaptater machinePersistenceAdaptater;
-    private InterfacePersistenceAdaptater interfacePersistenceAdaptater;
-    private ProcessorPersistenceAdaptater processorPersistenceAdaptater;
-    private PersistentStoragePersistenceAdaptater persistentStoragePersistenceAdaptater;
-    private VolatileStoragePersistenceAdaptater volatileStoragePersistenceAdaptater;
-    private ServicePersistenceAdaptater servicePersistenceAdaptater;
 
     @Test
     @Sql({"createMachineTable.sql",
@@ -72,25 +59,44 @@ public class MachinePersistenceAdaptaterTest extends AbstractIntegrationTest {
             "createServiceTable.sql",
             "insertService.sql"})
     public void testGetAllMachineEntities(){
-        initializeComponent();
+        List<MachineEntity> machineEntities = machinePersistenceAdaptater.getAllMachineEntities();
+
+        assertEquals("pc.1.local",machineEntities.get(0).getHostname());
+        assertEquals("cisco os 2214",machineEntities.get(1).getOs());
+
+        assertEquals("00-00-00-00-01-01",machineEntities.get(1).getInterfaces().get(0).getMacAddress());
+        assertEquals("192.168.0.10",machineEntities.get(2).getInterfaces().get(1).getIpAddress());
+
+        assertEquals(3.6,machineEntities.get(0).getProcessors().get(0).getFrequency());
+        assertEquals("Intel Xeon gold 6438N",machineEntities.get(1).getProcessors().get(1).getReference());
+
+        assertEquals("WD Purple",machineEntities.get(1).getPersistentStorages().get(1).getReference());
+        assertEquals(1440.0,machineEntities.get(2).getPersistentStorages().get(0).getUsed());
+
+        assertEquals("Crucial Pro",machineEntities.get(2).getVolatileStorages().get(0).getReference());
+        assertEquals(4,machineEntities.get(1).getVolatileStorages().get(1).getLatency());
+
+        assertEquals("data collection service",machineEntities.get(1).getServices().get(1).getName());
+        assertEquals("4321",machineEntities.get(2).getServices().get(0).getPort());
 
     }
 
-    private void initializeComponent(){
+    @BeforeEach
+    public void initializeComponent(){
         /* Initialize Mapper */
-        machineMapper = new MachineMapper();
-        interfaceMapper = new InterfaceMapper();
-        processorMapper = new ProcessorMapper();
-        persistentStorageMapper = new PersistentStorageMapper();
-        volatileStorageMapper = new VolatileStorageMapper();
-        serviceMapper = new ServiceMapper();
+        MachineMapper machineMapper = new MachineMapper();
+        InterfaceMapper interfaceMapper = new InterfaceMapper();
+        ProcessorMapper processorMapper = new ProcessorMapper();
+        PersistentStorageMapper persistentStorageMapper = new PersistentStorageMapper();
+        VolatileStorageMapper volatileStorageMapper = new VolatileStorageMapper();
+        ServiceMapper serviceMapper = new ServiceMapper();
 
         /* Initialize Adaptater */
-        interfacePersistenceAdaptater = new InterfacePersistenceAdaptater(interfaceRepository,interfaceMapper);
-        processorPersistenceAdaptater = new ProcessorPersistenceAdaptater(processorRepository,processorMapper);
-        persistentStoragePersistenceAdaptater = new PersistentStoragePersistenceAdaptater(persistentStorageRepository,persistentStorageMapper);
-        volatileStoragePersistenceAdaptater = new VolatileStoragePersistenceAdaptater(volatileStorageRepository,volatileStorageMapper);
-        servicePersistenceAdaptater = new ServicePersistenceAdaptater(serviceRepository,serviceMapper);
+        InterfacePersistenceAdaptater interfacePersistenceAdaptater = new InterfacePersistenceAdaptater(interfaceRepository, interfaceMapper);
+        ProcessorPersistenceAdaptater processorPersistenceAdaptater = new ProcessorPersistenceAdaptater(processorRepository, processorMapper);
+        PersistentStoragePersistenceAdaptater persistentStoragePersistenceAdaptater = new PersistentStoragePersistenceAdaptater(persistentStorageRepository, persistentStorageMapper);
+        VolatileStoragePersistenceAdaptater volatileStoragePersistenceAdaptater = new VolatileStoragePersistenceAdaptater(volatileStorageRepository, volatileStorageMapper);
+        ServicePersistenceAdaptater servicePersistenceAdaptater = new ServicePersistenceAdaptater(serviceRepository, serviceMapper);
         machinePersistenceAdaptater = new MachinePersistenceAdaptater(
                 machineRepository,
                 machineMapper,

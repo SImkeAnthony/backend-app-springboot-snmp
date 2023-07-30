@@ -24,6 +24,7 @@ dependencies {
     //Spring
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.testng:testng:7.1.0'
 
     //Lombock
     compileOnly 'org.projectlombok:lombok'
@@ -37,11 +38,14 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:9.4.0'
 
     // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
 
     //testImplementation Contener
     testImplementation "org.testcontainers:postgresql:1.16.0"
     runtimeOnly 'org.postgresql:postgresql'
+
 
     //SNMP
     implementation 'org.snmp4j:snmp4j:3.7.4'
