@@ -1,6 +1,7 @@
-package be.heh.backendappspringbootsnmp.domain.service;
+package be.heh.backendappspringbootsnmp.domain.service.unitaire;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
+import be.heh.backendappspringbootsnmp.domain.service.MachineService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public class MachineServiceTest {
+public class MachineServiceUnitaireTest {
     @Test
     public void getAllMachineEntitiesTestEmptyList(){
         MachineService machineService = new MachineService();

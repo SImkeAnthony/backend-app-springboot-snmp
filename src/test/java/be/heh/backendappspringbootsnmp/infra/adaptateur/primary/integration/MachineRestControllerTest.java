@@ -1,8 +1,6 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.primary.integration;
 
-import be.heh.backendappspringbootsnmp.domain.entities.Interface;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
-import be.heh.backendappspringbootsnmp.domain.entities.Service;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.primary.MachineRestController;
 import org.junit.jupiter.api.Test;
