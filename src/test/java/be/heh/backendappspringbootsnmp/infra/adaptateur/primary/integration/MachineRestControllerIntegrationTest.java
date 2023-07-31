@@ -6,8 +6,6 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.primary.MachineRestContr
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.nmap4j.core.nmap.NMapExecutionException;
-import org.nmap4j.core.nmap.NMapInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MachineRestController.class)
-public class MachineRestControllerTest {
+public class MachineRestControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
