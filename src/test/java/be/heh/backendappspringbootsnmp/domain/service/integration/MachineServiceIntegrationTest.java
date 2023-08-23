@@ -62,8 +62,8 @@ public class MachineServiceIntegrationTest {
         MachineEntity m1 = new MachineEntity(1L,"pc1.local","windows pro 11",true);
         MachineEntity m2 = new MachineEntity(2L,"pc2.local","linux FreeBSD",true);
 
-        m1.setInterfaces(List.of(new Interface(1L,"00-00-00-00-01","carte Ethernet VEthernet adaptater","192.168.0.5")));
-        m2.setInterfaces(List.of(new Interface(2L,"00-00-00-00-02","carte Ethernet VEthernet adaptater","192.168.0.10")));
+        m1.setInterfaces(List.of(new Interface(1L,"00-00-00-00-00-01","carte Ethernet VEthernet adaptater","192.168.0.5")));
+        m2.setInterfaces(List.of(new Interface(2L,"00-00-00-00-00-02","carte Ethernet VEthernet adaptater","192.168.0.10")));
 
         m1.setProcessors(List.of(new Processor(1L,"Intel core i9",24,56,5.80)));
         m2.setProcessors(List.of(new Processor(2L,"Intel core i7",20,48,5.40)));
@@ -86,9 +86,9 @@ public class MachineServiceIntegrationTest {
         MachineEntity m2 = new MachineEntity(4L,"pc4.local","linux FreeBSD",true);
         MachineEntity m3 = new MachineEntity(5L,"pc5.local","linux ubuntu",true);
 
-        m1.setInterfaces(List.of(new Interface(3L,"00-00-00-00-03","carte Ethernet VEthernet adaptater","192.168.0.20")));
-        m2.setInterfaces(List.of(new Interface(4L,"00-00-00-00-04","Adaptater VirtualBox Ethernet","192.168.0.30")));
-        m3.setInterfaces(List.of(new Interface(5L,"00-00-00-00-05","carte wifi Realtek 2.4","192.168.0.40")));
+        m1.setInterfaces(List.of(new Interface(3L,"00-00-00-00-00-03","carte Ethernet VEthernet adaptater","192.168.0.20")));
+        m2.setInterfaces(List.of(new Interface(4L,"00-00-00-00-00-04","Adaptater VirtualBox Ethernet","192.168.0.30")));
+        m3.setInterfaces(List.of(new Interface(5L,"00-00-00-00-00-05","carte wifi Realtek 2.4","192.168.0.40")));
 
         m1.setProcessors(List.of(new Processor(3L,"Intel core i9",24,56,5.80)));
         m2.setProcessors(List.of(new Processor(4L,"Intel core i7",20,48,5.40)));
