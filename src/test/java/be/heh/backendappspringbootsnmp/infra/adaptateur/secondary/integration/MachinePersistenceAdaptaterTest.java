@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
@@ -46,18 +45,6 @@ public class MachinePersistenceAdaptaterTest extends AbstractIntegrationTest {
     private MachinePersistenceAdaptater machinePersistenceAdaptater;
 
     @Test
-    @Sql({"createMachineTable.sql",
-            "insertMachine.sql",
-            "createInterfaceTable.sql",
-            "insertInterface.sql",
-            "createProcessorTable.sql",
-            "insertProcessor.sql",
-            "createPersistentStorageTable.sql",
-            "insertPersistentStorage.sql",
-            "createVolatileStorageTable.sql",
-            "insertVolatileStorage.sql",
-            "createServiceTable.sql",
-            "insertService.sql"})
     public void testGetAllMachineEntities(){
         List<MachineEntity> machineEntities = machinePersistenceAdaptater.getAllMachineEntities();
 

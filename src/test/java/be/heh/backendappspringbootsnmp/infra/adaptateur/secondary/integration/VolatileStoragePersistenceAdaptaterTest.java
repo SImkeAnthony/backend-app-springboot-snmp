@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class VolatileStoragePersistenceAdaptaterTest extends AbstractIntegration
     private VolatileStorageRepository volatileStorageRepository;
 
     @Test
-    @Sql({"createMachineTable.sql","insertMachine.sql","createVolatileStorageTable.sql", "insertVolatileStorage.sql"})
     public void testGetAllVStorages(){
         VolatileStoragePersistenceAdaptater volatileStoragePersistenceAdaptater = new VolatileStoragePersistenceAdaptater(volatileStorageRepository,new VolatileStorageMapper());
 
@@ -36,5 +34,4 @@ public class VolatileStoragePersistenceAdaptaterTest extends AbstractIntegration
         assertEquals("Crucial Pro",volatileStorages.get(5).getReference());
         assertEquals(4,volatileStorages.get(1).getLatency());
     }
-
 }

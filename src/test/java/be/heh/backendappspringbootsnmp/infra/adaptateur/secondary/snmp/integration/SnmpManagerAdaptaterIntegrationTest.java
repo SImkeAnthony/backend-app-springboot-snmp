@@ -1,8 +1,6 @@
 package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.integration;
 
 import be.heh.backendappspringbootsnmp.domain.entities.*;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistenceAdaptater;
-import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.MibBrowser;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.SnmpManagerAdaptater;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpInterfaceManager;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.snmp.manager.SnmpMaterialsManager;
@@ -51,7 +49,6 @@ public class SnmpManagerAdaptaterIntegrationTest {
 
         //simulate function's behavior
         doAnswer(invocation -> {
-            System.out.println("insert machine!!!");
             snmpSystemManager.getSnmpListener().getMachineEntities().addAll(List.of(
                     new MachineEntity("pc1.local","windows pro 11",true),
                     new MachineEntity("pc2.local","Oracle Server",true),
@@ -61,7 +58,6 @@ public class SnmpManagerAdaptaterIntegrationTest {
         }).when(snmpSystemManager).completeMachineEntitiesWithSystemVariables(ipAddress);
 
         doAnswer(invocation -> {
-            System.out.println("insert interface!!!");
             snmpSystemManager.getSnmpListener().getMachineEntities().get(0).setInterfaces(List.of(new Interface("00-00-00-00-00-01","Adaptater WiFi Realtek 2.4","192.168.0.10")));
             snmpSystemManager.getSnmpListener().getMachineEntities().get(1).setInterfaces(List.of(new Interface("00-00-00-00-00-02","Adaptater VEthernet VMWare","192.168.0.20")));
             snmpSystemManager.getSnmpListener().getMachineEntities().get(2).setInterfaces(List.of(new Interface("00-00-00-00-00-03","Adaptater Ethernet","192.168.0.30")));
@@ -69,7 +65,6 @@ public class SnmpManagerAdaptaterIntegrationTest {
         }).when(snmpInterfaceManager).completeInterfacesForEachMachineEntities(MockitoHamcrest.argThat(PersonalMatcher.sameAsSet(ipAddress)));
 
         doAnswer(invocation -> {
-            System.out.println("insert materials!!!");
             //processor
             snmpSystemManager.getSnmpListener().getMachineEntities().get(0).setProcessors(List.of(new Processor("intel core i9",24,56,5.80)));
             snmpSystemManager.getSnmpListener().getMachineEntities().get(1).setProcessors(List.of(new Processor("intel core i7",20,48,5.40)));
@@ -86,7 +81,6 @@ public class SnmpManagerAdaptaterIntegrationTest {
         }).when(snmpMaterialsManager).completeMaterialsForEachMachineEntities(MockitoHamcrest.argThat(PersonalMatcher.sameAsSet(ipAddress)));
 
         doAnswer(invocation -> {
-            System.out.println("insert services!!!");
             snmpSystemManager.getSnmpListener().getMachineEntities().get(0).setServices(List.of(new Service("web app","application web React for planning online","3030-5432")));
             snmpSystemManager.getSnmpListener().getMachineEntities().get(1).setServices(List.of(new Service("file shared","application for sharing file into department","111-2049")));
             snmpSystemManager.getSnmpListener().getMachineEntities().get(2).setServices(List.of(new Service("connexion-operation","application for connecting operation each other","5263-5264")));

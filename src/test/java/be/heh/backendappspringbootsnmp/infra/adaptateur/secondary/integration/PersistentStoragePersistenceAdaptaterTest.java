@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class PersistentStoragePersistenceAdaptaterTest extends AbstractIntegrati
     private PersistentStorageRepository persistentStorageRepository;
 
     @Test
-    @Sql({"createMachineTable.sql","insertMachine.sql","createPersistentStorageTable.sql", "insertPersistentStorage.sql"})
     public void testGetAllPStorages(){
 
         PersistentStoragePersistenceAdaptater persistentStoragePersistenceAdaptater = new PersistentStoragePersistenceAdaptater(persistentStorageRepository,new PersistentStorageMapper());

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class ServicePersistenceAdaptaterTest extends AbstractIntegrationTest{
     private ServiceRepository serviceRepository;
 
     @Test
-    @Sql({"createMachineTable.sql","insertMachine.sql","createServiceTable.sql", "insertService.sql"})
     public void testGetAllServices(){
         ServicePersistenceAdaptater servicePersistenceAdaptater = new ServicePersistenceAdaptater(serviceRepository,new ServiceMapper());
 
