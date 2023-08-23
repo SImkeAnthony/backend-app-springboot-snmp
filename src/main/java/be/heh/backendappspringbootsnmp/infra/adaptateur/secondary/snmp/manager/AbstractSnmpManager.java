@@ -18,6 +18,7 @@ import org.snmp4j.util.DefaultPDUFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 @RequiredArgsConstructor
 public class AbstractSnmpManager {
     @Setter
@@ -67,17 +68,20 @@ public class AbstractSnmpManager {
         getSnmp().getMessageDispatcher().addMessageProcessingModel(new MPv1(new DefaultPDUFactory()));
         getSnmp().getMessageDispatcher().addMessageProcessingModel(new MPv3());
         OctetString localEngineID = new OctetString(MPv3.createLocalEngineID());
-        getSnmp().setLocalEngine(localEngineID.getValue(),0,0);
+        getSnmp().setLocalEngine(localEngineID.getValue(), 0, 0);
         getSnmp().listen();
     }
-    protected void initSnmpV3() throws IOException{
+
+    protected void initSnmpV3() throws IOException {
         setSnmp(new Snmp());
         getSnmp().setMessageDispatcher(new MessageDispatcherImpl());
 
-        // Very important to add snmp as command responder which will finally process the PDU:
+        // Very important to add snmp as command responder which will finally process
+        // the PDU:
         getSnmp().getMessageDispatcher().addCommandResponder(getSnmp());
 
-        DefaultUdpTransportMapping defaultUdpTransportMapping = new DefaultUdpTransportMapping(new UdpAddress("0.0.0.0/161"));
+        DefaultUdpTransportMapping defaultUdpTransportMapping = new DefaultUdpTransportMapping(
+                new UdpAddress("0.0.0.0/161"));
         defaultUdpTransportMapping.listen();
         getSnmp().getMessageDispatcher().addTransportMapping(defaultUdpTransportMapping);
         getSnmp().addTransportMapping(defaultUdpTransportMapping);
@@ -90,78 +94,85 @@ public class AbstractSnmpManager {
         getUsm().setEngineDiscoveryEnabled(true);
         SecurityModels.getInstance().addSecurityModel(getUsm());
 
-        //create user
-        UsmUser user = new UsmUser(new OctetString("anthony"),AuthMD5.ID,new OctetString("Silver-Major-Knight-16"),PrivDES.ID,new OctetString("Silver-Major-Knight-16"));
-        System.out.println("User Created :\n\tuser : "+user);
+        // create user
+        UsmUser user = new UsmUser(new OctetString("anthony"), AuthMD5.ID, new OctetString("Silver-Major-Knight-16"),
+                PrivDES.ID, new OctetString("Silver-Major-Knight-16"));
+        System.out.println("User Created :\n\tuser : " + user);
         getUsm().addUser(user);
-        System.out.println("USM user :\n\tuser : "+getUsm().getUser(new OctetString(MPv3.createLocalEngineID()),new OctetString("anthony")));
+        System.out.println("USM user :\n\tuser : "
+                + getUsm().getUser(new OctetString(MPv3.createLocalEngineID()), new OctetString("anthony")));
 
         setContextEngineId(localEngineID);
         setContextName(new OctetString(getCommunityString()));
 
         getSnmp().getMessageDispatcher().addMessageProcessingModel(new MPv3(usm.getLocalEngineID().getValue()));
-        getSnmp().setLocalEngine(localEngineID.getValue(),0,0);
+        getSnmp().setLocalEngine(localEngineID.getValue(), 0, 0);
         getSnmp().listen();
     }
-    protected void initPDU(int pduType){
+
+    protected void initPDU(int pduType) {
         setPdu(new PDU());
-        for(String oid:getOIDs()){
+        for (String oid : getOIDs()) {
             getPdu().add(new VariableBinding(new OID(oid)));
         }
         getPdu().setType(pduType);
         getPdu().setRequestID(new Integer32(getLockRequestID().getRequestID()));
-        if(getLockRequestID().getRequestID()>10000){
+        if (getLockRequestID().getRequestID() > 10000) {
             getLockRequestID().setRequestID(0);
             getSnmpListener().getRequestController().clear();
         }
-        getLockRequestID().setRequestID(getLockRequestID().getRequestID()+1);
-        if(getPdu().getErrorStatus()!=0){
-            System.err.println("Error pdu : "+getPdu().getErrorStatus()+" => "+getPdu().getErrorStatusText());
+        getLockRequestID().setRequestID(getLockRequestID().getRequestID() + 1);
+        if (getPdu().getErrorStatus() != 0) {
+            System.err.println("Error pdu : " + getPdu().getErrorStatus() + " => " + getPdu().getErrorStatusText());
         }
     }
-    protected void initPDU(int pduType,int index,String oidIndex){
+
+    protected void initPDU(int pduType, int index, String oidIndex) {
         setPdu(new PDU());
-        for(String oid:getOIDs()){
+        for (String oid : getOIDs()) {
             VariableBinding variableBinding = new VariableBinding();
             variableBinding.setOid(new OID(oid));
-            if(variableBinding.getOid().format().equals(oidIndex)){
+            if (variableBinding.getOid().format().equals(oidIndex)) {
                 variableBinding.setVariable(new Integer32(index));
             }
             getPdu().add(variableBinding);
         }
         getPdu().setType(pduType);
         getPdu().setRequestID(new Integer32(getLockRequestID().getRequestID()));
-        if(getLockRequestID().getRequestID()>10000){
+        if (getLockRequestID().getRequestID() > 10000) {
             getLockRequestID().setRequestID(0);
             getSnmpListener().getRequestController().clear();
         }
-        getLockRequestID().setRequestID(getLockRequestID().getRequestID()+1);
-        if(getPdu().getErrorStatus()!=0){
-            System.err.println("Error pdu : "+getPdu().getErrorStatus()+" => "+getPdu().getErrorStatusText());
+        getLockRequestID().setRequestID(getLockRequestID().getRequestID() + 1);
+        if (getPdu().getErrorStatus() != 0) {
+            System.err.println("Error pdu : " + getPdu().getErrorStatus() + " => " + getPdu().getErrorStatusText());
         }
     }
-    protected void initScopedPDU(int scopedPduType){
+
+    protected void initScopedPDU(int scopedPduType) {
         setScopedPDU(new ScopedPDU());
-        for(String oid:getOIDs()){
+        for (String oid : getOIDs()) {
             getScopedPDU().add(new VariableBinding(new OID(oid)));
         }
         getScopedPDU().setType(scopedPduType);
         getScopedPDU().setContextEngineID(getContextEngineId());
         getScopedPDU().setContextName(getContextName());
         getScopedPDU().setRequestID(new Integer32(getLockRequestID().getRequestID()));
-        if(getLockRequestID().getRequestID()>10000){
+        if (getLockRequestID().getRequestID() > 10000) {
             getLockRequestID().setRequestID(0);
             getSnmpListener().getRequestController().clear();
         }
-        getLockRequestID().setRequestID(getLockRequestID().getRequestID()+1);
-        if(getScopedPDU().getErrorStatus()!=0){
-            System.err.println("Error pdu : "+getScopedPDU().getErrorStatus()+" => "+getScopedPDU().getErrorStatusText());
+        getLockRequestID().setRequestID(getLockRequestID().getRequestID() + 1);
+        if (getScopedPDU().getErrorStatus() != 0) {
+            System.err.println(
+                    "Error pdu : " + getScopedPDU().getErrorStatus() + " => " + getScopedPDU().getErrorStatusText());
         }
     }
-    protected CommunityTarget getCommunityTarget(String ip){
-        //create Address
+
+    protected CommunityTarget getCommunityTarget(String ip) {
+        // create Address
         Address address = GenericAddress.parse(String.format("udp:%s/%s", ip, getPort()));
-        //Create community
+        // Create community
         CommunityTarget target = new CommunityTarget();
         target.setCommunity(new OctetString(getCommunityString()));
         target.setAddress(address);
@@ -170,12 +181,13 @@ public class AbstractSnmpManager {
         target.setVersion(SnmpConstants.version1);
         return target;
     }
-    protected Target<Address> getUserTargetV3(String ip){
-        //create a target
-        Address address = GenericAddress.parse(String.format("udp:%s/%s",ip , getPort()));
+
+    protected Target<Address> getUserTargetV3(String ip) {
+        // create a target
+        Address address = GenericAddress.parse(String.format("udp:%s/%s", ip, getPort()));
         Target<Address> userTarget = new UserTarget<>();
         userTarget.setAddress(address);
-        System.out.println("User Address : "+userTarget.getAddress());
+        System.out.println("User Address : " + userTarget.getAddress());
         userTarget.setRetries(3);
         userTarget.setTimeout(1000);
         userTarget.setVersion(SnmpConstants.version3);

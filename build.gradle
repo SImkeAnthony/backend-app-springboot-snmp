@@ -18,6 +18,7 @@ configurations {
 repositories {
     mavenCentral()
     mavenLocal()
+    jcenter()
 }
 
 dependencies {
@@ -46,6 +47,14 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:1.16.0"
     runtimeOnly 'org.postgresql:postgresql'
 
+    //test E2E
+    testImplementation 'io.rest-assured:rest-assured-common:5.3.1'
+    testImplementation 'io.rest-assured:spring-web-test-client:5.3.1'
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.3.1'
+    testImplementation 'io.rest-assured:json-schema-validator:5.3.1'
+    testImplementation 'io.rest-assured:xml-path:5.3.1'
+    testImplementation 'io.rest-assured:json-path:5.3.1'
+    testImplementation 'io.rest-assured:rest-assured:5.3.1'
 
     //SNMP
     implementation 'org.snmp4j:snmp4j:3.7.4'

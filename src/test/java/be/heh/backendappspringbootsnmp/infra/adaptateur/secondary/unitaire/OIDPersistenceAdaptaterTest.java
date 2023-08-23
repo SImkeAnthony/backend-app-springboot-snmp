@@ -6,7 +6,6 @@ import be.heh.backendappspringbootsnmp.infra.adaptateur.secondary.OIDPersistence
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.smi.OID;
