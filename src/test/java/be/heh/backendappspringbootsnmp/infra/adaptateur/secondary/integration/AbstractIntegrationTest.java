@@ -15,7 +15,7 @@ public abstract class AbstractIntegrationTest {
 
         Flyway flyway = Flyway.configure()
                 .dataSource(POSTGRES_SQL_CONTAINER.getJdbcUrl(), POSTGRES_SQL_CONTAINER.getUsername(), POSTGRES_SQL_CONTAINER.getPassword())
-                .locations("classpath:db/migration")
+                .locations("classpath:be/heh/backendappspringbootsnmp/infra/adaptateur/secondary/integration")
                 .load();
         flyway.migrate();
     }

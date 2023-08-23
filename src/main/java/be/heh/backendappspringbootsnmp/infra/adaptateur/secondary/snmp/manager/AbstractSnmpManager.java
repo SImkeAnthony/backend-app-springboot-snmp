@@ -47,7 +47,7 @@ public class AbstractSnmpManager {
     @Getter
     private List<String> OIDs = new ArrayList<>();
     @Getter
-    private int port = 162;
+    private int port = 161;
     @Getter
     @Setter
     private LockResponseCounter lockResponseCounter;
