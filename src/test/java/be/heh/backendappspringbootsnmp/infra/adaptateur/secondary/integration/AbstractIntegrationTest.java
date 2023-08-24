@@ -7,7 +7,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 public abstract class AbstractIntegrationTest {
-    protected static PostgreSQLContainer POSTGRES_SQL_CONTAINER;
+    protected static final PostgreSQLContainer POSTGRES_SQL_CONTAINER;
 
     static {
         POSTGRES_SQL_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.2-alpine"));

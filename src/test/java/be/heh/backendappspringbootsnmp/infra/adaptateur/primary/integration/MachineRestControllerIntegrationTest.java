@@ -31,7 +31,7 @@ public class MachineRestControllerIntegrationTest {
     @MockBean
     private MachinePortIn machinePortIn;
 
-    private List<MachineEntity> machineEntities=new ArrayList<>();
+    private final List<MachineEntity> machineEntities=new ArrayList<>();
 
     @Test
     @Order(1)

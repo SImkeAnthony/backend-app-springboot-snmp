@@ -8,6 +8,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface MachinePortIn {
-    public Iterable<MachineEntity> getAllMachineEntities() throws NMapExecutionException, NMapInitializationException, IOException;
-    public Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException;
+    Iterable<MachineEntity> getAllMachineEntities() throws NMapExecutionException, NMapInitializationException, IOException;
+    Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException;
 }

@@ -27,8 +27,8 @@ public class SnmpManagerAdaptaterIntegrationTest {
     private SnmpServiceManager snmpServiceManager;
 
     private SnmpListener snmpListener;
-    private static Map<Integer, Pair<String, Boolean>> requestControllerTest = new HashMap<>();
-    private static List<MachineEntity> machineEntities = new ArrayList<>();
+    private static final Map<Integer, Pair<String, Boolean>> requestControllerTest = new HashMap<>();
+    private static final List<MachineEntity> machineEntities = new ArrayList<>();
 
     @Test
     public void getInfoMachineEntitiesTest(){

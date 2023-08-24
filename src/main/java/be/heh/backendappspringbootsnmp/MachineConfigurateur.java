@@ -48,12 +48,12 @@ public class MachineConfigurateur {
     // ---------------- //
     //      Mapper      //
     // ---------------- //
-    private MachineMapper machineMapper=new MachineMapper();
-    private InterfaceMapper interfaceMapper = new InterfaceMapper();
-    private ProcessorMapper processorMapper = new ProcessorMapper();
-    private PersistentStorageMapper persistentStorageMapper = new PersistentStorageMapper();
-    private VolatileStorageMapper volatileStorageMapper = new VolatileStorageMapper();
-    private ServiceMapper serviceMapper = new ServiceMapper();
+    private final MachineMapper machineMapper=new MachineMapper();
+    private final InterfaceMapper interfaceMapper = new InterfaceMapper();
+    private final ProcessorMapper processorMapper = new ProcessorMapper();
+    private final PersistentStorageMapper persistentStorageMapper = new PersistentStorageMapper();
+    private final VolatileStorageMapper volatileStorageMapper = new VolatileStorageMapper();
+    private final ServiceMapper serviceMapper = new ServiceMapper();
     // ----------------- //
     //      Adaptater    //
     // ----------------- //
@@ -77,7 +77,7 @@ public class MachineConfigurateur {
     // -------------------- //
     private MibBrowser mibBrowser;
     private SnmpListener snmpListener;
-    private Map<String, MOAccess> access = new HashMap<>();
+    private final Map<String, MOAccess> access = new HashMap<>();
 
     private void completeAccess(){
         access.put("read-only", MOAccessImpl.ACCESS_READ_ONLY);

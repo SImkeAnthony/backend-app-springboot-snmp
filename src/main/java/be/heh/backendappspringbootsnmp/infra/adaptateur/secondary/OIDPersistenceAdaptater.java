@@ -21,7 +21,7 @@ public class OIDPersistenceAdaptater {
     @Setter
     private String mibFile;
     @Getter
-    private List<MOManager> moManagers = new ArrayList<>();
+    private final List<MOManager> moManagers = new ArrayList<>();
 
     public void initMOManagers(){
         getMibBrowser().reinitialize(getMibFile());

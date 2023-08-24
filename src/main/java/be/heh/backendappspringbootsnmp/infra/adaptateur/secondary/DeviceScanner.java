@@ -16,7 +16,7 @@ import java.util.*;
 public class DeviceScanner implements DeviceScannerPortOut {
     private final String pathNmapExecutale="C:\\Program Files (x86)\\Nmap";
     @Getter
-    private Nmap4j nmap4j = new Nmap4j(pathNmapExecutale);
+    private final Nmap4j nmap4j = new Nmap4j(pathNmapExecutale);
 
     @Override
     public List<String> getAllIpOnNetwork(String ipRange) {

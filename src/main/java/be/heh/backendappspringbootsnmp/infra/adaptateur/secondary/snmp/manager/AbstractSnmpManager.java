@@ -34,7 +34,7 @@ public class AbstractSnmpManager {
     @Getter
     private ScopedPDU scopedPDU;
     @Getter
-    private String communityString = "Silver-King-Rogue-16";
+    private final String communityString = "Silver-King-Rogue-16";
     @Setter
     @Getter
     private CommunityTarget community;
@@ -45,9 +45,9 @@ public class AbstractSnmpManager {
     @Getter
     private OctetString contextEngineId;
     @Getter
-    private List<String> OIDs = new ArrayList<>();
+    private final List<String> OIDs = new ArrayList<>();
     @Getter
-    private int port = 161;
+    private final int port = 161;
     @Getter
     @Setter
     private LockResponseCounter lockResponseCounter;

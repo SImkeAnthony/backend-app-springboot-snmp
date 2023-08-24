@@ -18,6 +18,7 @@ import static io.restassured.RestAssured.*;
  * This is an end-to-end test
  * Ensure that this test is running only in a development environment
  * Before running this test, ensure you ran a single agent SNMP freestanding (available here : https://github.com/SImkeAnthony/agent-snmp.git)
+ * And ensure you ran an instance of PostgreSQl container via Docker (command : docker run -d --name=postgres -p 5432:5432 -e POSTGRES_PASSWORD=root postgres:latest)
  * Otherwise this test will fail
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,classes = BackendAppSpringbootSnmpApplication.class)
@@ -37,7 +38,7 @@ public class E2ETest {
         //system
         Assertions.assertEquals("generic.hostname.local",response.jsonPath().getString("[0].hostname"));
         Assertions.assertEquals("generic os by generic society",response.jsonPath().getString("[0].os"));
-        Assertions.assertEquals(true,response.jsonPath().getBoolean("[0].snmp"));
+        Assertions.assertTrue(response.jsonPath().getBoolean("[0].snmp"));
 
         //interface
         List<Map<String, ?>> interfaces = response.jsonPath().getList("[0].interfaces");

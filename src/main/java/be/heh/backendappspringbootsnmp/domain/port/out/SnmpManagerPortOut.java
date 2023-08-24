@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SnmpManagerPortOut {
 
-    public List<MachineEntity> getInfoMachineEntities(List<String> ipAddress) throws IOException, InterruptedException;
+    List<MachineEntity> getInfoMachineEntities(List<String> ipAddress) throws IOException, InterruptedException;
 }

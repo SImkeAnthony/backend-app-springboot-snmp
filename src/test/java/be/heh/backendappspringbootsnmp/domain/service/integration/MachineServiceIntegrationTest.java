@@ -26,8 +26,8 @@ public class MachineServiceIntegrationTest {
     private DeviceScannerPortOut deviceScannerPortOut;
     private MachinePortOut machinePortOut;
     private SnmpManagerPortOut snmpManagerPortOut;
-    private static List<MachineEntity> registeredMachineEntities = new ArrayList<>();
-    private static List<MachineEntity> discoveredMachineEntities = new ArrayList<>();
+    private static final List<MachineEntity> registeredMachineEntities = new ArrayList<>();
+    private static final List<MachineEntity> discoveredMachineEntities = new ArrayList<>();
     @Test
     public void getAllMachineEntitiesTest() throws NMapExecutionException, NMapInitializationException, IOException, InterruptedException {
         //mock each third parties
@@ -51,7 +51,7 @@ public class MachineServiceIntegrationTest {
         MachineService machineService = new MachineService(machinePortOut,deviceScannerPortOut,snmpManagerPortOut);
         Iterable<MachineEntity> actualMachineEntities = machineService.getAllMachineEntities();
 
-        Assertions.assertEquals(true,actualMachineEntities.iterator().hasNext());
+        Assertions.assertTrue(actualMachineEntities.iterator().hasNext());
         Assertions.assertEquals(5, Iterators.size(actualMachineEntities.iterator()));
         Assertions.assertEquals("192.168.0.5",Iterators.get(actualMachineEntities.iterator(),0).getInterfaces().get(0).getIpAddress());
         Assertions.assertEquals("Intel Xeon Gold",Iterators.get(actualMachineEntities.iterator(),4).getProcessors().get(0).getReference());

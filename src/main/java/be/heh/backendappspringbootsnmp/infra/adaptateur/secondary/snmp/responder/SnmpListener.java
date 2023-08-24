@@ -19,11 +19,11 @@ public class SnmpListener implements ResponseListener {
     @Getter
     private final OIDPersistenceAdaptater oidPersistenceAdaptater;
     @Getter
-    private List<MachineEntity> machineEntities = new ArrayList<>();
+    private final List<MachineEntity> machineEntities = new ArrayList<>();
     @Getter
-    private Map<Integer, Pair<String, Boolean>> requestController = new HashMap<>();
+    private final Map<Integer, Pair<String, Boolean>> requestController = new HashMap<>();
     @Getter
-    private Map<String, Integer> managerController = new HashMap<>();
+    private final Map<String, Integer> managerController = new HashMap<>();
     @Setter
     @Getter
     private LockResponseCounter lockResponseCounter;
@@ -43,13 +43,13 @@ public class SnmpListener implements ResponseListener {
     @Getter
     private int sNumber;
     @Getter
-    private List<VariableBinding> systemVariableBindings = new ArrayList<>();
+    private final List<VariableBinding> systemVariableBindings = new ArrayList<>();
     @Getter
-    private List<VariableBinding> interfacesVariableBindings = new ArrayList<>();
+    private final List<VariableBinding> interfacesVariableBindings = new ArrayList<>();
     @Getter
-    private List<VariableBinding> materialsVariableBindings = new ArrayList<>();
+    private final List<VariableBinding> materialsVariableBindings = new ArrayList<>();
     @Getter
-    private List<VariableBinding> servicesVariableBindings = new ArrayList<>();
+    private final List<VariableBinding> servicesVariableBindings = new ArrayList<>();
 
     @Override
     public <A extends Address> void onResponse(ResponseEvent<A> event) {

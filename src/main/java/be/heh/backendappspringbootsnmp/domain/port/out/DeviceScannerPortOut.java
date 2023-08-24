@@ -7,6 +7,6 @@ import org.nmap4j.core.nmap.NMapInitializationException;
 import java.util.List;
 
 public interface DeviceScannerPortOut {
-    public List<String> getAllIpOnNetwork(String ipRange) throws NMapExecutionException, NMapInitializationException;
-    public MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity,List<String> ipAddress) throws NMapExecutionException, NMapInitializationException;
+    List<String> getAllIpOnNetwork(String ipRange) throws NMapExecutionException, NMapInitializationException;
+    MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity,List<String> ipAddress) throws NMapExecutionException, NMapInitializationException;
 }
