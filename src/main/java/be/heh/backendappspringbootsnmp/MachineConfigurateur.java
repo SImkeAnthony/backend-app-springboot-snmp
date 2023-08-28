@@ -63,6 +63,7 @@ public class MachineConfigurateur {
     private PersistentStoragePersistenceAdaptater persistentStoragePersistenceAdaptater;
     private VolatileStoragePersistenceAdaptater volatileStoragePersistenceAdaptater;
     private ServicePersistenceAdaptater servicePersistenceAdaptater;
+    @Autowired
     private DeviceScanner deviseScanner;
     private OIDPersistenceAdaptater oidPersistenceAdaptater;
     // ------------------ //
@@ -97,7 +98,7 @@ public class MachineConfigurateur {
         volatileStoragePersistenceAdaptater = new VolatileStoragePersistenceAdaptater(volatileStorageRepository,volatileStorageMapper);
         servicePersistenceAdaptater = new ServicePersistenceAdaptater(serviceRepository,serviceMapper);
         machinePersistenceAdaptater = new MachinePersistenceAdaptater(machineRepository,machineMapper, interfacePersistenceAdaptater, processorPersistenceAdaptater, persistentStoragePersistenceAdaptater, volatileStoragePersistenceAdaptater,servicePersistenceAdaptater);
-        deviseScanner = new DeviceScanner();
+        //deviseScanner = new DeviceScanner();
         return new MachineService(machinePersistenceAdaptater,deviseScanner,getSnmpManagerPortOut());
     }
 

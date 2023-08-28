@@ -9,17 +9,22 @@ import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
 import org.nmap4j.data.host.Address;
 import org.nmap4j.data.nmaprun.Host;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
-
-@RequiredArgsConstructor
+@Component
 public class DeviceScanner implements DeviceScannerPortOut {
-    private final String pathNmapExecutale="C:\\Program Files (x86)\\Nmap";
+    @Value("${nmap.path}")
+    private String path;
     @Getter
-    private final Nmap4j nmap4j = new Nmap4j(pathNmapExecutale);
+    private Nmap4j nmap4j;
 
     @Override
     public List<String> getAllIpOnNetwork(String ipRange) {
+        nmap4j = new Nmap4j(path);
         List<String>ipAddress=new ArrayList<>();
         nmap4j.includeHosts(ipRange);
         nmap4j.addFlags("-sP"); //not right flags correct this later
@@ -46,8 +51,8 @@ public class DeviceScanner implements DeviceScannerPortOut {
     }
     @Override
     public MachineEntity getAllInfoOfMachineEntity(MachineEntity machineEntity,List<String> ipAddress) {
-        Nmap4j scanOs = new Nmap4j(pathNmapExecutale);
-        Nmap4j scanHostname = new Nmap4j(pathNmapExecutale);
+        Nmap4j scanOs = new Nmap4j(path);
+        Nmap4j scanHostname = new Nmap4j(path);
         String hosts=String.join("-",ipAddress);
         scanOs.includeHosts(hosts);
         scanHostname.includeHosts(hosts);
