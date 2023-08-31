@@ -45,7 +45,7 @@ public class MachineService implements MachinePortIn {
         try{
             if(getIpAddress().isEmpty() && getDeviceScannerPortOut()!=null){
                 //scan network
-                setIpAddress(getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254"));
+                setIpAddress(getDeviceScannerPortOut().getAllIpOnNetwork(""));
             }
             //getIpAddress().forEach(System.out::println);
             //get infos
@@ -65,11 +65,11 @@ public class MachineService implements MachinePortIn {
     }
 
     @Override
-    public Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException {
+    public Iterable<MachineEntity> rescanNetwork(String ipRange) throws NMapExecutionException, NMapInitializationException, IOException {
         try{
             if(getDeviceScannerPortOut()!=null){
                 Set<String> ipMerge = new HashSet<>();
-                List<String> ipScan  = getDeviceScannerPortOut().getAllIpOnNetwork("192.168.0.1-254");
+                List<String> ipScan  = getDeviceScannerPortOut().getAllIpOnNetwork(ipRange);
                 ipMerge.addAll(ipScan);
                 ipMerge.addAll(getIpAddress());
                 setIpAddress(ipMerge.stream().toList());

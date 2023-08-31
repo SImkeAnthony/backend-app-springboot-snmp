@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface MachinePortIn {
     Iterable<MachineEntity> getAllMachineEntities() throws NMapExecutionException, NMapInitializationException, IOException;
-    Iterable<MachineEntity> rescanNetwork() throws NMapExecutionException, NMapInitializationException, IOException;
+    Iterable<MachineEntity> rescanNetwork(String ipRange) throws NMapExecutionException, NMapInitializationException, IOException;
 }

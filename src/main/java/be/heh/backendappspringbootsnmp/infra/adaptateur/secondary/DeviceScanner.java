@@ -2,16 +2,13 @@ package be.heh.backendappspringbootsnmp.infra.adaptateur.secondary;
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.out.DeviceScannerPortOut;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.nmap4j.Nmap4j;
 import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
 import org.nmap4j.data.host.Address;
 import org.nmap4j.data.nmaprun.Host;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -19,6 +16,8 @@ import java.util.*;
 public class DeviceScanner implements DeviceScannerPortOut {
     @Value("${nmap.path}")
     private String path;
+    @Value("${nmap.hosts}")
+    private String hostRange;
     @Getter
     private Nmap4j nmap4j;
 
@@ -26,7 +25,11 @@ public class DeviceScanner implements DeviceScannerPortOut {
     public List<String> getAllIpOnNetwork(String ipRange) {
         nmap4j = new Nmap4j(path);
         List<String>ipAddress=new ArrayList<>();
-        nmap4j.includeHosts(ipRange);
+        if (ipRange.isEmpty()) {
+            nmap4j.includeHosts(hostRange);
+        } else {
+            nmap4j.includeHosts(ipRange);
+        }
         nmap4j.addFlags("-sP"); //not right flags correct this later
         try{
             nmap4j.execute();

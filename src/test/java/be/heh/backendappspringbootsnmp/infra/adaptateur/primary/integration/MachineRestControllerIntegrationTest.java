@@ -2,7 +2,10 @@ package be.heh.backendappspringbootsnmp.infra.adaptateur.primary.integration;
 
 import be.heh.backendappspringbootsnmp.domain.entities.MachineEntity;
 import be.heh.backendappspringbootsnmp.domain.port.in.MachinePortIn;
+import be.heh.backendappspringbootsnmp.domain.entities.IpRange;
 import be.heh.backendappspringbootsnmp.infra.adaptateur.primary.MachineRestController;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,9 +19,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,12 +66,18 @@ public class MachineRestControllerIntegrationTest {
         machineEntities.add(new MachineEntity("machine5.local","linux RHEL 7",false));
         machineEntities.add(new MachineEntity("machine4.local","oracle",false));
 
+        IpRange ipRange = new IpRange(new JSONObject().put("ipRange","192.168.0.0-255"));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonIpRange = objectMapper.writeValueAsString(ipRange);
+
         //Stub
-        Mockito.when(machinePortIn.rescanNetwork()).thenReturn(machineEntities);
+        Mockito.when(machinePortIn.rescanNetwork(ipRange.getIpRange())).thenReturn(machineEntities);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/scan")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .post("/scan")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonIpRange))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[2].hostname",is("machine4.local")))
