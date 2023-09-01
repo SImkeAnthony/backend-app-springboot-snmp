@@ -1,25 +1,29 @@
 package be.heh.backendappspringbootsnmp;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.core.env.Environment;
 
 @Configuration
-public class SecurityWebConfiguration{
+public class SecurityWebConfiguration {
 
-    @Value("${react.origin}")
-    private String origin;
+    @Autowired
+    private Environment env;
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/").allowedOrigins("http://"+origin);
-                registry.addMapping("/scan").allowedOrigins("http://"+origin);
-                registry.addMapping("/").allowedOrigins("https://"+origin);
-                registry.addMapping("/scan").allowedOrigins("https://"+origin);
+                String origin = env.getProperty("react.origin");
+                registry.addMapping("/**")
+                        .allowedOrigins("http://"+origin)
+                        .allowedOrigins("https://"+origin)
+                        .allowedHeaders("Access-Control-Allow-Origin")
+                        .allowedMethods("GET","POST")
+                        .allowCredentials(true);
             }
         };
     }
